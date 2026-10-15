@@ -32,7 +32,7 @@
 | **Navigation** | `NavigationRail`, `SegmentedButton` | 80dp desktop navigation rail with active pill indicator + connected M3 segmented button group |
 | **Lists** | `ListItem` | 3-slot list rows (leading icon/avatar, headline + supporting text, trailing switch/badge) |
 | **Overlays** | `Tooltip`, `Snackbar`, `Menu` | Inverse-surface tooltips, floating feedback pills with action, anchored dropdown menus with shortcuts |
-| **Notifications** | `ToastHost`, `ShowToast`, `CloseToast` | Material 3 toasts: an inverse-surface host holding info/success/error toasts with kind icons, an action and a close button, auto-dismissing |
+| **Notifications** | `ToastHost`, `ShowToast`, `CloseToast` | Material 3 toasts hugging their content, auto-dismissing, deduped by title. Two outlines (`ToastCapsule` pill / `ToastCorner` rounded rectangle) and two palettes (`ToastSurface` in the app's own colors / `ToastInverse` the classic dark snackbar), info/success/error kind icons, an action and a close button |
 | **Media & Structure** | `Avatar`, `InitialsAvatar`, `Accordion`, `SearchBar` | Circular avatars (icon or hash-initials), collapsible panels, and 56dp search pills |
 
 ## Installation

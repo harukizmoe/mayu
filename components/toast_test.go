@@ -60,6 +60,95 @@ func TestToastHostShowsAndActs(t *testing.T) {
 	}
 }
 
+func TestToastShapes(t *testing.T) {
+	scheme := theme.SchemeFromSeed(ui.Hex("#6750A4"), false)
+	th := theme.NewTheme(scheme, theme.DensityStandard)
+
+	for _, shape := range []ToastShape{ToastCapsule, ToastCorner} {
+		name := "capsule"
+		if shape == ToastCorner {
+			name = "corner"
+		}
+		t.Run(name, func(t *testing.T) {
+			shown, acted := false, false
+			tt := ui.NewTester(func(c *ui.Context) {
+				ToastHost(c, ToastHostOptions{Shape: shape}, th)
+				if !shown {
+					shown = true
+					ShowToast(c, ToastOptions{
+						Title:       "已保存",
+						Description: "改动已写入磁盘",
+						Kind:        ToastSuccess,
+						Action:      "撤销",
+						OnAction:    func() { acted = true },
+						Close:       true,
+					})
+				}
+			}, 700, 300)
+			tt.Frame()
+
+			for _, want := range []string{"已保存", "改动已写入磁盘", "撤销", "Close"} {
+				if !tt.HasText(want) {
+					t.Fatalf("the %s toast lacks %q: %q", name, want, tt.Texts())
+				}
+			}
+
+			if err := tt.Click("撤销"); err != nil {
+				t.Fatalf("clicking the %s toast action: %v", name, err)
+			}
+			if !acted {
+				t.Errorf("the %s toast action did not run OnAction", name)
+			}
+		})
+	}
+}
+
+// The default toast must read as part of a light app rather than as a dark
+// slab, and the inverse one must stay dark: this pins the Material You
+// surface palette against a regression to the classic black snackbar.
+func TestToastColorsReadOnTheirTheme(t *testing.T) {
+	for _, dark := range []bool{false, true} {
+		for _, color := range []ToastColor{ToastSurface, ToastInverse} {
+			scheme := theme.SchemeFromSeed(ui.Hex("#6750A4"), dark)
+			th := theme.NewTheme(scheme, theme.DensityStandard)
+
+			shown := false
+			tt := ui.NewTester(func(c *ui.Context) {
+				ToastHost(c, ToastHostOptions{Placement: ToastBottomEnd, Color: color}, th)
+				if !shown {
+					shown = true
+					ShowToast(c, ToastOptions{Title: "已保存", Kind: ToastSuccess})
+				}
+			}, 420, 120)
+			tt.Frame()
+
+			// Sample just inside the toast's fill, past the title's box.
+			r, ok := tt.Find("已保存")
+			if !ok {
+				t.Fatal("the toast's title is not laid out")
+			}
+			img := tt.Image()
+			x, y := int(r.X+r.W+6), int(r.Y+r.H/2)
+			i := img.PixOffset(x, y)
+			pixel := ui.RGB(img.Pix[i], img.Pix[i+1], img.Pix[i+2])
+			lum := 0.2126*float64(pixel.R) + 0.7152*float64(pixel.G) + 0.0722*float64(pixel.B)
+
+			wantLight := color == ToastSurface
+			if dark {
+				wantLight = !wantLight
+			}
+			if wantLight && lum < 160 {
+				t.Errorf("dark=%v %v: the toast is dark (luminance %.0f), not a surface",
+					dark, color, lum)
+			}
+			if !wantLight && lum > 110 {
+				t.Errorf("dark=%v %v: the inverse toast is light (luminance %.0f)",
+					dark, color, lum)
+			}
+		}
+	}
+}
+
 func TestToastCloseButtonAndIconOverrides(t *testing.T) {
 	scheme := theme.SchemeFromSeed(ui.Hex("#6750A4"), false)
 	th := theme.NewTheme(scheme, theme.DensityStandard)

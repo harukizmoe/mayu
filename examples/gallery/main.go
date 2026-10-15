@@ -58,6 +58,14 @@ type galleryApp struct {
 	dialogOpen    bool
 	snackbarOpen  bool
 	snackbarMsg   string
+
+	// toastShapeIdx picks the host's toast outline: 0 capsule, 1 corner.
+	toastShapeIdx int
+	// toastColorIdx picks the host's toast colors: 0 surface, 1 inverse.
+	toastColorIdx int
+	sideSheetOpen bool
+	// refreshIdx is the side sheet's refresh-rate choice, its own group.
+	refreshIdx int
 }
 
 func newGalleryApp() *galleryApp {
@@ -83,6 +91,9 @@ func newGalleryApp() *galleryApp {
 		dialogOpen:     false,
 		snackbarOpen:   false,
 		snackbarMsg:    "Settings saved successfully",
+		toastShapeIdx:  0,
+		toastColorIdx:  0,
+		sideSheetOpen:  false,
 	}
 }
 
@@ -98,7 +109,19 @@ func (a *galleryApp) view(c *ui.Context) {
 	scheme := t.Scheme
 
 	// Material 3 toasts show in this host, over everything else.
-	mayu.ToastHostWith(c, mayu.ToastHostOptions{Placement: mayu.ToastBottomEnd})
+	toastShape := mayu.ToastCapsule
+	if a.toastShapeIdx == 1 {
+		toastShape = mayu.ToastCorner
+	}
+	toastColor := mayu.ToastSurface
+	if a.toastColorIdx == 1 {
+		toastColor = mayu.ToastInverse
+	}
+	mayu.ToastHostWith(c, mayu.ToastHostOptions{
+		Placement: mayu.ToastBottomEnd,
+		Shape:     toastShape,
+		Color:     toastColor,
+	})
 
 	// Top-level layout: Navigation Rail on left, Scrollable content on right
 	ui.Row(c).Fill().Children(func() {
@@ -445,14 +468,7 @@ func (a *galleryApp) view(c *ui.Context) {
 					})
 
 					ui.Column(c).Gap(8).Children(func() {
-						ui.Row(c).AlignItems(ui.Center).Justify(ui.SpaceBetween).Children(func() {
-							ui.Text(c, fmt.Sprintf("Standard Slider: %.0f%%", a.sliderVal))
-							mayu.Button(c, "Open Alert Dialog", mayu.VariantFilledTonal).
-								OnClick(func() {
-									a.dialogOpen = true
-								})
-						})
-
+						ui.Text(c, fmt.Sprintf("Standard Slider: %.0f%%", a.sliderVal)).TextColor(scheme.OnSurfaceVariant)
 						mayu.Slider(c, &a.sliderVal, 0, 100)
 						mayu.LinearProgress(c, float32(a.sliderVal/100.0))
 					})
@@ -461,6 +477,22 @@ func (a *galleryApp) view(c *ui.Context) {
 				// Toast & Snackbar notifications
 				ui.Column(c).Gap(12).Children(func() {
 					ui.Text(c, "Toast & Snackbar Notifications").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Column(c).Gap(8).Children(func() {
+						ui.Text(c, "Toast shape").FontSize(theme.LabelLarge.Size).TextColor(scheme.OnSurfaceVariant)
+						mayu.SegmentedButton(c, &a.toastShapeIdx, []mayu.SegmentOption{
+							{Label: "Capsule 胶囊"},
+							{Label: "Corner 圆角矩形"},
+						})
+					})
+
+					ui.Column(c).Gap(8).Children(func() {
+						ui.Text(c, "Toast color").FontSize(theme.LabelLarge.Size).TextColor(scheme.OnSurfaceVariant)
+						mayu.SegmentedButton(c, &a.toastColorIdx, []mayu.SegmentOption{
+							{Label: "Surface 应用表面"},
+							{Label: "Inverse 反色"},
+						})
+					})
 
 					ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
 						mayu.FilledTonalButton(c, "Toast: Success").
@@ -514,6 +546,24 @@ func (a *galleryApp) view(c *ui.Context) {
 					})
 				})
 
+				// Modal surfaces: a side sheet anchored to the right edge.
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Modal Surfaces").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+						mayu.FilledTonalButton(c, "Open Side Sheet").
+							Icon(symbols.Settings).
+							OnClick(func() {
+								a.sideSheetOpen = true
+							})
+
+						mayu.OutlinedButton(c, "Open Alert Dialog").
+							OnClick(func() {
+								a.dialogOpen = true
+							})
+					})
+				})
+
 				// Snackbar trigger
 				if a.snackbarOpen {
 					mayu.Snackbar(c, a.snackbarMsg, mayu.SnackbarOptions{
@@ -546,6 +596,52 @@ func (a *galleryApp) view(c *ui.Context) {
 			a.lastAction = "Reset All Settings"
 		},
 		DismissText: "Cancel",
+	})
+
+	// Modal side sheet anchored to the right edge while sideSheetOpen.
+	mayu.SideSheet(c, &a.sideSheetOpen, mayu.SideSheetOptions{
+		Title:    "显示与亮度",
+		Subtitle: "DP-1（主显示器）",
+		Actions: func() {
+			ui.Row(c).Justify(ui.End).Gap(8).Children(func() {
+				mayu.TextButton(c, "取消").
+					OnClick(func() { a.sideSheetOpen = false })
+				mayu.FilledButton(c, "应用").
+					OnClick(func() {
+						a.sideSheetOpen = false
+						a.lastAction = "应用了显示设置"
+						mayu.ShowToast(c, mayu.ToastOptions{
+							Title: "显示设置已应用",
+							Kind:  mayu.ToastSuccess,
+						})
+					})
+			})
+		},
+	}, func() {
+		mayu.LabeledSlider(c, &a.brightnessVal, 0, 100, mayu.LabeledSliderOptions{
+			Label: "亮度 (Brightness)",
+			Icon:  symbols.Lightbulb,
+		})
+
+		mayu.LabeledSlider(c, &a.volumeVal, 0, 100, mayu.LabeledSliderOptions{
+			Label: "音量 (Volume)",
+			Icon:  symbols.VolumeUp,
+		})
+
+		ui.Column(c).Gap(8).Children(func() {
+			ui.Text(c, "显示选项").FontSize(theme.TitleSmall.Size).Bold().TextColor(scheme.OnSurface)
+			mayu.Switch(c, &a.switchVal, "夜间模式")
+			mayu.Checkbox(c, &a.checkboxVal, "硬件加速合成")
+		})
+
+		mayu.SegmentedButton(c, &a.refreshIdx, []mayu.SegmentOption{
+			{Label: "60 Hz"},
+			{Label: "120 Hz"},
+			{Label: "180 Hz"},
+		})
+
+		mayu.OutlinedTextField(c, &a.username, "配置文件名").
+			Placeholder("my-profile")
 	})
 }
 

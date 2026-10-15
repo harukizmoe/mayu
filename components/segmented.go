@@ -26,7 +26,11 @@ func SegmentedButton(c *ui.Context, selected *int, options []SegmentOption, t *t
 		for i, opt := range options {
 			idx := i
 			isChosen := *selected == idx
-			seg := parts.Segment(idx).Height(40).Padding(0, 16).Gap(8).Center().Focusable()
+			// Segments share the track's width equally, so the group has no
+			// gap after the last one and choosing a segment does not resize it
+			// as its check mark appears.
+			seg := parts.Segment(idx).Grow(1).Height(40).Padding(0, 8).Gap(8).
+				Center().Focusable()
 
 			// Segment background & foreground colors
 			var bg ui.Color

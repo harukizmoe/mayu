@@ -170,3 +170,13 @@ var (
 	// InverseWarning marks what calls for care.
 	InverseWarning = ui.Hex("#FFD8A8")
 )
+
+// Accents for what stands on the app's own surfaces, where InverseSuccess and
+// its siblings are too pale to read. Error and the rest come from the scheme;
+// these are the two roles Material 3 leaves to the app.
+var (
+	// Success marks what went well, as "Saved".
+	Success = ui.Hex("#2E6C3F")
+	// Warning marks what calls for care.
+	Warning = ui.Hex("#8A5300")
+)
