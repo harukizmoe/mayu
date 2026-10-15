@@ -155,3 +155,7 @@ Run unit tests and race detection across all packages:
 ```sh
 go test -race ./...
 ```
+
+## License
+
+[MIT](LICENSE)
