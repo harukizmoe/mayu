@@ -37,13 +37,15 @@ func NewSearchBar(c *ui.Context, query *string, placeholder string, t *theme.The
 		// Leading search icon
 		ui.Icon(c, symbols.Search).Size(22, 22).TextColor(t.Scheme.OnSurfaceVariant)
 
-		// Middle editable text input
+		// Middle editable text input, named for assistive technology: without
+		// a name a screen reader reads the box as an unnamed text field.
 		input := ui.TextInputBase(c, query).
 			Grow(1).
 			TextColor(t.Scheme.OnSurface)
 
 		if placeholder != "" {
 			input.Placeholder(placeholder)
+			input.Label(placeholder)
 		}
 		builder.input = input
 

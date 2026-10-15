@@ -137,9 +137,14 @@ mayui/
 │   └── state_layer.go         // Hover (8%), Focus (10%), Pressed (10%) overlays
 ├── symbols/                   // Standard Material Symbols (SVG)
 └── examples/
-    └── gallery/               // Comprehensive interactive showcase
-        └── main.go
+    └── gallery/               // Interactive showcase, in three pages
+        ├── main.go            // the window, the app state and the shell
+        ├── chrome.go          // the page header, the search box and the footer
+        └── pages.go           // the Components, Overlays and Theme pages
 ```
+
+The navigation rail switches between the pages, and the search box filters the
+sections of the page being shown.
 
 ## Running the Gallery
 
