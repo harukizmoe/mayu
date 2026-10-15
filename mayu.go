@@ -27,7 +27,9 @@ const (
 
 // Re-exported option types.
 type AlertDialogOptions = components.AlertDialogOptions
+type SideSheetOptions = components.SideSheetOptions
 type CapsuleSliderOptions = components.CapsuleSliderOptions
+type LabeledSliderOptions = components.LabeledSliderOptions
 type SegmentOption = components.SegmentOption
 type ListItemOptions = components.ListItemOptions
 type NavDestination = components.NavDestination
@@ -35,6 +37,24 @@ type NavigationRailOptions = components.NavigationRailOptions
 type SnackbarOptions = components.SnackbarOptions
 type MenuItemOptions = components.MenuItemOptions
 type MenuPanel = components.MenuPanel
+type ToastOptions = components.ToastOptions
+type ToastHostOptions = components.ToastHostOptions
+type ToastKind = components.ToastKind
+type ToastPlacement = components.ToastPlacement
+
+// Toast kinds, which choose a toast's icon and its color.
+const (
+	ToastInfo    ToastKind = components.ToastInfo
+	ToastSuccess ToastKind = components.ToastSuccess
+	ToastError   ToastKind = components.ToastError
+)
+
+// Where a ToastHost holds its toasts across the window.
+const (
+	ToastBottomCenter ToastPlacement = components.ToastBottomCenter
+	ToastBottomStart  ToastPlacement = components.ToastBottomStart
+	ToastBottomEnd    ToastPlacement = components.ToastBottomEnd
+)
 
 // ThemeOptions configures the Material 3 design system for the window.
 type ThemeOptions struct {
@@ -259,6 +279,12 @@ func HorizontalCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, icon
 func CapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts CapsuleSliderOptions) *components.CapsuleSliderBuilder {
 	return components.NewCapsuleSlider(c, value, lo, hi, opts, CurrentTheme(c))
 }
+
+// LabeledSlider creates a card-style slider: a header of an icon, a label and a
+// value badge above a full-width track with a round thumb.
+func LabeledSlider(c *ui.Context, value *float64, lo, hi float64, opts LabeledSliderOptions) ui.Element {
+	return components.LabeledSlider(c, value, lo, hi, opts, CurrentTheme(c))
+}
 func HorizontalDivider(c *ui.Context) ui.Element {
 	return components.HorizontalDivider(c, CurrentTheme(c))
 }
@@ -285,6 +311,13 @@ func Badge(c *ui.Context, count int) ui.Element {
 // AlertDialog renders an M3 Alert Dialog when *open is true.
 func AlertDialog(c *ui.Context, open *bool, opts AlertDialogOptions) ui.Element {
 	return components.AlertDialog(c, open, opts, CurrentTheme(c))
+}
+
+// SideSheet renders an M3 modal side sheet anchored to the right edge while
+// *open is true. The side-anchored sibling of AlertDialog: same overlay, but a
+// full-height panel instead of a centred box.
+func SideSheet(c *ui.Context, open *bool, opts SideSheetOptions, content func()) ui.Element {
+	return components.SideSheet(c, open, opts, CurrentTheme(c), content)
 }
 
 // ==========================================
@@ -323,6 +356,31 @@ func Snackbar(c *ui.Context, message string, opts SnackbarOptions) ui.Element {
 // Menu renders an M3 Dropdown Menu popup anchored to an element when *open is true.
 func Menu(c *ui.Context, anchor ui.Element, open *bool, items func(m *MenuPanel)) ui.Element {
 	return components.Menu(c, anchor, open, items, CurrentTheme(c))
+}
+
+// ==========================================
+// 9b. Toasts
+// ==========================================
+
+// ToastHost installs the Material 3 look of the window's toasts. Call it once
+// in the view, anywhere; ShowToast then shows toasts in it.
+func ToastHost(c *ui.Context) ui.Element {
+	return components.ToastHost(c, components.ToastHostOptions{}, CurrentTheme(c))
+}
+
+// ToastHostWith installs the toast host with a chosen placement and width.
+func ToastHostWith(c *ui.Context, opts ToastHostOptions) ui.Element {
+	return components.ToastHost(c, opts, CurrentTheme(c))
+}
+
+// ShowToast shows a toast and returns its ID, to close it with CloseToast.
+func ShowToast(c *ui.Context, opts ToastOptions) string {
+	return components.ShowToast(c, opts)
+}
+
+// CloseToast closes the toast with id, or every toast when id is empty.
+func CloseToast(c *ui.Context, id string) {
+	components.CloseToast(c, id)
 }
 
 // ==========================================

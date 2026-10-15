@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/egoist/mygo"
 	"github.com/egoist/mygo/ui"
@@ -95,6 +96,9 @@ func (a *galleryApp) view(c *ui.Context) {
 		Density:   a.density,
 	})
 	scheme := t.Scheme
+
+	// Material 3 toasts show in this host, over everything else.
+	mayu.ToastHostWith(c, mayu.ToastHostOptions{Placement: mayu.ToastBottomEnd})
 
 	// Top-level layout: Navigation Rail on left, Scrollable content on right
 	ui.Row(c).Fill().Children(func() {
@@ -225,6 +229,20 @@ func (a *galleryApp) view(c *ui.Context) {
 
 				mayu.HorizontalDivider(c)
 
+				// Labeled Slider (标题滑块卡片)
+				ui.Column(c).Gap(12).MaxWidthPercent(100).Children(func() {
+					ui.Text(c, "Labeled Slider (Card)").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Box(c).MaxWidth(560).Children(func() {
+						mayu.LabeledSlider(c, &a.brightnessVal, 0, 100, mayu.LabeledSliderOptions{
+							Label: "亮度 (Brightness)",
+							Icon:  symbols.Lightbulb,
+						})
+					})
+				})
+
+				mayu.HorizontalDivider(c)
+
 				// 4. Buttons & Floating Actions
 				ui.Column(c).Gap(12).Children(func() {
 					ui.Text(c, "Buttons & Floating Actions").FontSize(theme.TitleMedium.Size).Bold()
@@ -291,8 +309,10 @@ func (a *galleryApp) view(c *ui.Context) {
 								Shortcut: "⌘C",
 								OnClick: func() {
 									a.lastAction = "Menu Item Copy Link"
-									a.snackbarOpen = true
-									a.snackbarMsg = "Copied to clipboard"
+									mayu.ShowToast(c, mayu.ToastOptions{
+										Title: "已复制到剪贴板",
+										Kind:  mayu.ToastSuccess,
+									})
 								},
 							})
 							m.Divider()
@@ -435,6 +455,62 @@ func (a *galleryApp) view(c *ui.Context) {
 
 						mayu.Slider(c, &a.sliderVal, 0, 100)
 						mayu.LinearProgress(c, float32(a.sliderVal/100.0))
+					})
+				})
+
+				// Toast & Snackbar notifications
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Toast & Snackbar Notifications").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+						mayu.FilledTonalButton(c, "Toast: Success").
+							Icon(symbols.Check).
+							OnClick(func() {
+								mayu.ShowToast(c, mayu.ToastOptions{
+									Title:       "已保存",
+									Description: "改动已写入磁盘",
+									Kind:        mayu.ToastSuccess,
+									Close:       true,
+								})
+							})
+
+						mayu.FilledTonalButton(c, "Toast: Error").
+							Icon(symbols.Close).
+							OnClick(func() {
+								mayu.ShowToast(c, mayu.ToastOptions{
+									Title:       "上传失败",
+									Description: "网络连接不可用，请稍后重试",
+									Kind:        mayu.ToastError,
+									Close:       true,
+								})
+							})
+
+						mayu.FilledTonalButton(c, "Toast: Info").
+							Icon(symbols.Info).
+							OnClick(func() {
+								mayu.ShowToast(c, mayu.ToastOptions{
+									Title:   "Material You 已启用",
+									Kind:    mayu.ToastInfo,
+									Timeout: 3 * time.Second,
+								})
+							})
+
+						mayu.FilledTonalButton(c, "Toast: Undo").
+							OnClick(func() {
+								mayu.ShowToast(c, mayu.ToastOptions{
+									Title:    "已将 3 个项目移至废纸篓",
+									Kind:     mayu.ToastInfo,
+									Action:   "撤销",
+									OnAction: func() { a.lastAction = "撤销了删除操作" },
+									Close:    true,
+								})
+							})
+
+						mayu.OutlinedButton(c, "Show Snackbar").
+							OnClick(func() {
+								a.snackbarOpen = true
+								a.snackbarMsg = "Settings saved successfully"
+							})
 					})
 				})
 
