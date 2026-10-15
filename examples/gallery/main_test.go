@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 	"github.com/harukizmoe/mayu"
@@ -10,7 +11,7 @@ import (
 func TestGallery_InteractiveFeatures(t *testing.T) {
 	app := newGalleryApp()
 
-	tt := ui.NewTester(app.view, 1200, 2600)
+	tt := ui.NewTester(app.view, 1400, 2900)
 
 	// 1. Verify desktop skeleton and navigation
 	if !tt.HasText("Overview") || !tt.HasText("Favorites") || !tt.HasText("Config") {
@@ -108,5 +109,149 @@ func TestGallery_InteractiveFeatures(t *testing.T) {
 	tt.Frame()
 	if !tt.HasText("已保存") {
 		t.Fatalf("the toast does not show, texts: %q", tt.Texts())
+	}
+}
+
+func TestGallery_ToastShapes(t *testing.T) {
+	app := newGalleryApp()
+	tt := ui.NewTester(app.view, 1400, 2900)
+
+	// The capsule shape is the host's default.
+	if app.toastShapeIdx != 0 {
+		t.Fatalf("expected the capsule shape by default, got %d", app.toastShapeIdx)
+	}
+
+	// Switch the host to the rounded rectangle.
+	if err := tt.Click("Corner 圆角矩形"); err != nil {
+		t.Fatalf("failed clicking the toast shape segment: %v", err)
+	}
+	if app.toastShapeIdx != 1 {
+		t.Errorf("expected the shape to switch to corner, got %d", app.toastShapeIdx)
+	}
+
+	tt.Frame()
+	if err := tt.Click("Toast: Undo"); err != nil {
+		t.Fatalf("failed clicking the toast trigger: %v", err)
+	}
+	tt.Frame()
+	if !tt.HasText("已将 3 个项目移至废纸篓") {
+		t.Fatalf("the corner-shaped toast does not show, texts: %q", tt.Texts())
+	}
+	if !tt.HasText("撤销") {
+		t.Fatalf("the corner-shaped toast lacks its action, texts: %q", tt.Texts())
+	}
+
+	// Switch the host to the inverse colors, the classic snackbar.
+	if err := tt.Click("Inverse 反色"); err != nil {
+		t.Fatalf("failed clicking the toast color segment: %v", err)
+	}
+	if app.toastColorIdx != 1 {
+		t.Errorf("expected the colors to switch to inverse, got %d", app.toastColorIdx)
+	}
+
+	tt.Frame()
+	if err := tt.Click("Toast: Info"); err != nil {
+		t.Fatalf("failed clicking the toast trigger: %v", err)
+	}
+	tt.Frame()
+	if !tt.HasText("Material You 已启用") {
+		t.Fatalf("the inverse-colored toast does not show, texts: %q", tt.Texts())
+	}
+	// Every component of the library must be reachable from the gallery.
+	for _, want := range []string{
+		"Tooltips, Dividers & Icon Buttons",
+		"悬停查看提示",
+		"关闭全部 Toast",
+		"Modal Surfaces",
+		"Open Side Sheet",
+		"Advanced System Configuration",
+	} {
+		if !tt.HasText(want) {
+			t.Errorf("the gallery does not show %q", want)
+		}
+	}
+
+	// A tooltip appears once its anchor has been hovered for its delay.
+	move, ok := tt.Find("悬停查看提示")
+	if !ok {
+		t.Fatal("the chip with a tooltip is not laid out")
+	}
+	tt.Move(move.X+move.W/2, move.Y+move.H/2)
+	time.Sleep(700 * time.Millisecond) // the tooltip's 600ms delay
+	tt.Frame()
+	if !tt.HasText("这是 M3 Tooltip") {
+		t.Fatalf("the tooltip does not show, texts: %q", tt.Texts())
+	}
+}
+
+func TestGallery_SeedPicker(t *testing.T) {
+	app := newGalleryApp()
+	tt := ui.NewTester(app.view, 1400, 2900)
+
+	// Choosing a seed recolors the window with it.
+	if err := tt.Click("Ocean Blue"); err != nil {
+		t.Fatalf("failed clicking a seed: %v", err)
+	}
+	if app.seedIndex != 2 || app.clicks != 1 {
+		t.Fatalf("expected the Ocean Blue seed from one click, got seed %d after %d clicks",
+			app.seedIndex, app.clicks)
+	}
+
+	// The selected seed's button must still be the one that acts: building an
+	// outlined button and replacing it with a filled one draws the selected
+	// seed twice, with the inert copy first, so this click would do nothing.
+	if err := tt.Click("Ocean Blue"); err != nil {
+		t.Fatalf("failed clicking the selected seed: %v", err)
+	}
+	if app.clicks != 2 {
+		t.Fatalf("the selected seed's button does not act: %d clicks", app.clicks)
+	}
+
+	// And switching away and back keeps working.
+	if err := tt.Click("M3 Purple"); err != nil {
+		t.Fatalf("failed clicking M3 Purple: %v", err)
+	}
+	if app.seedIndex != 0 || app.clicks != 3 {
+		t.Fatalf("expected the M3 Purple seed from a third click, got seed %d after %d clicks",
+			app.seedIndex, app.clicks)
+	}
+}
+
+func TestGallery_SideSheet(t *testing.T) {
+	app := newGalleryApp()
+	tt := ui.NewTester(app.view, 1400, 2900)
+
+	// A closed side sheet contributes nothing.
+	if tt.HasText("显示与亮度") {
+		t.Fatal("the side sheet renders while closed")
+	}
+	if tt.HasText("DP-1（主显示器）") {
+		t.Fatal("the side sheet's subtitle renders while closed")
+	}
+
+	if err := tt.Click("Open Side Sheet"); err != nil {
+		t.Fatalf("failed clicking the side sheet trigger: %v", err)
+	}
+	if !app.sideSheetOpen {
+		t.Fatal("expected the side sheet to open")
+	}
+
+	tt.Frame()
+	for _, want := range []string{"显示与亮度", "DP-1（主显示器）", "亮度 (Brightness)", "显示选项", "夜间模式", "配置文件名"} {
+		if !tt.HasText(want) {
+			t.Fatalf("the side sheet lacks %q: %q", want, tt.Texts())
+		}
+	}
+
+	// The footer action closes the sheet and raises a toast.
+	if err := tt.Click("应用"); err != nil {
+		t.Fatalf("failed clicking the side sheet's footer action: %v", err)
+	}
+	if app.sideSheetOpen {
+		t.Error("expected 应用 to close the side sheet")
+	}
+	tt.Frame()
+	if !tt.HasText("显示设置已应用") {
+		t.Fatalf("no toast after applying, texts: %q", tt.Texts())
 	}
 }

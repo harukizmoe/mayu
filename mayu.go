@@ -41,12 +41,26 @@ type ToastOptions = components.ToastOptions
 type ToastHostOptions = components.ToastHostOptions
 type ToastKind = components.ToastKind
 type ToastPlacement = components.ToastPlacement
+type ToastShape = components.ToastShape
+type ToastColor = components.ToastColor
 
 // Toast kinds, which choose a toast's icon and its color.
 const (
 	ToastInfo    ToastKind = components.ToastInfo
 	ToastSuccess ToastKind = components.ToastSuccess
 	ToastError   ToastKind = components.ToastError
+)
+
+// The outline a host draws its toasts with.
+const (
+	ToastCorner  ToastShape = components.ToastCorner
+	ToastCapsule ToastShape = components.ToastCapsule
+)
+
+// The color roles a host fills its toasts with.
+const (
+	ToastSurface ToastColor = components.ToastSurface
+	ToastInverse ToastColor = components.ToastInverse
 )
 
 // Where a ToastHost holds its toasts across the window.
