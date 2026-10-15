@@ -37,6 +37,9 @@ type NavigationRailOptions = components.NavigationRailOptions
 type SnackbarOptions = components.SnackbarOptions
 type MenuItemOptions = components.MenuItemOptions
 type MenuPanel = components.MenuPanel
+type SelectOption[T comparable] = components.SelectOption[T]
+type AutocompleteBuilder = components.AutocompleteBuilder
+type CircularProgressOptions = components.CircularProgressOptions
 type ToastOptions = components.ToastOptions
 type ToastHostOptions = components.ToastHostOptions
 type ToastKind = components.ToastKind
@@ -254,6 +257,42 @@ func FilledTextField(c *ui.Context, value *string, label string) *components.Tex
 // OutlinedTextField constructs an M3 Outlined Text Field.
 func OutlinedTextField(c *ui.Context, value *string, label string) *components.TextFieldBuilder {
 	return components.NewTextField(c, value, label, components.TextFieldOutlined, CurrentTheme(c))
+}
+
+// FilledTextArea constructs an M3 Filled Text Area: a field several lines tall.
+func FilledTextArea(c *ui.Context, value *string, label string) *components.TextFieldBuilder {
+	return components.NewTextArea(c, value, label, components.TextFieldFilled, CurrentTheme(c))
+}
+
+// OutlinedTextArea constructs an M3 Outlined Text Area.
+func OutlinedTextArea(c *ui.Context, value *string, label string) *components.TextFieldBuilder {
+	return components.NewTextArea(c, value, label, components.TextFieldOutlined, CurrentTheme(c))
+}
+
+// ==========================================
+// 4b. Choosing
+// ==========================================
+
+// Tabs creates an M3 tab list choosing one of labels.
+func Tabs(c *ui.Context, selected *int, labels []string) ui.Element {
+	return components.Tabs(c, selected, labels, CurrentTheme(c))
+}
+
+// Select creates an M3 select choosing one of options.
+func Select[T comparable](c *ui.Context, selected *T, label string, options []components.SelectOption[T]) ui.Element {
+	return components.Select(c, selected, label, options, CurrentTheme(c))
+}
+
+// Autocomplete creates an M3 autocomplete: a field whose text filters the
+// suggestions listed under it.
+func Autocomplete(c *ui.Context, text *string, label string, suggestions []string) *components.AutocompleteBuilder {
+	return components.NewAutocomplete(c, text, label, suggestions, CurrentTheme(c))
+}
+
+// CircularProgress draws an M3 circular progress ring: determinate for a
+// progress between 0 and 1, spinning for a negative one.
+func CircularProgress(c *ui.Context, progress float32, opts components.CircularProgressOptions) ui.Element {
+	return components.CircularProgress(c, progress, opts, CurrentTheme(c))
 }
 
 // ==========================================

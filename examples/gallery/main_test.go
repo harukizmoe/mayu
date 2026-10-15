@@ -31,7 +31,10 @@ func TestGallery_Navigation(t *testing.T) {
 		}
 	}
 
-	components := []string{"Buttons & Floating Actions", "Cards", "Selection Controls", "Accordion"}
+	components := []string{
+		"Buttons & Floating Actions", "Cards", "Selection Controls",
+		"Text Fields & Areas", "Tabs", "Select & Autocomplete", "Accordion",
+	}
 	overlays := []string{"Tooltips & Dividers", "Dropdown Menu", "Toast & Snackbar", "Modal Surfaces"}
 	themePage := []string{"Dynamic Seed Color", "Tonal Elevation", "Typography & Shape", "Capsule Sliders"}
 
@@ -144,6 +147,44 @@ func TestGallery_ComponentsPage(t *testing.T) {
 	}
 	if app.lastAction != "Clicked an action chip" {
 		t.Fatalf("the chip did not act: %q", app.lastAction)
+	}
+
+	// A text area holds several lines where a field holds one.
+	if !tt.HasText("Release notes") {
+		t.Fatal("the text area is missing")
+	}
+
+	// The tabs choose, and the chosen label is the one that acts.
+	if err := tt.Click("Buses"); err != nil {
+		t.Fatalf("failed clicking a tab: %v", err)
+	}
+	if app.tabIdx != 2 {
+		t.Errorf("the tab did not change, got %d", app.tabIdx)
+	}
+
+	// A select shows the chosen option's label and stores its value.
+	if err := tt.Click("Time zone"); err != nil {
+		t.Fatalf("failed opening the select: %v", err)
+	}
+	if err := tt.Click("UTC+9 — Tokyo"); err != nil {
+		t.Fatalf("failed choosing an option: %v", err)
+	}
+	if app.zone != "UTC+9" {
+		t.Errorf("the select stored %q, want UTC+9", app.zone)
+	}
+
+	// An autocomplete takes a suggestion into its own field.
+	if err := tt.Click("City"); err != nil {
+		t.Fatalf("failed opening the autocomplete: %v", err)
+	}
+	tt.Type("sing")
+	if !tt.HasText("Singapore") {
+		t.Fatalf("the suggestions are not filtered: %q", tt.Texts())
+	}
+	tt.Key(0, ui.KeyEnter)
+	tt.Frame()
+	if app.city != "Singapore" {
+		t.Errorf("the suggestion was not taken, city=%q", app.city)
 	}
 
 	if err := tt.Click("Sarah Connor"); err != nil {

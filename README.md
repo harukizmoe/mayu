@@ -20,11 +20,12 @@
 | **Icon Buttons** | `IconButton`, `FilledIconButton`, `FilledTonalIconButton`, `OutlinedIconButton` | 40x40 circular icon action buttons |
 | **Cards** | `ElevatedCard`, `FilledCard`, `OutlinedCard` | 12dp rounded cards with tonal surface containers and clickable states |
 | **Selection** | `Checkbox`, `Switch`, `Radio` | M3 toggle controls with responsive state layers and accompanying labels |
-| **Text Inputs** | `FilledTextField`, `OutlinedTextField` | Single-line text inputs with floating labels, placeholders, and error/helper text |
+| **Text Inputs** | `FilledTextField`, `OutlinedTextField`, `FilledTextArea`, `OutlinedTextArea` | Text inputs with floating labels and placeholders, one line or several |
+| **Choosing** | `Tabs`, `Select`, `Autocomplete` | A tab row with a raised indicator, a select over a popup of options, and a field whose text filters its suggestions |
+| **Progress** | `LinearProgress`, `CircularProgress`, `Badge` | Determinate progress bars and rings, an indeterminate spinner, and notification badges |
 | **Chips** | `Chip`, `FilterChip` | Compact 32dp action tags and selected filter chips |
 | **Sliders** | `Slider` | Continuous track sliders with active/inactive colored ranges and round thumb |
 | **Dividers** | `HorizontalDivider`, `VerticalDivider` | 1dp hairline separators in `OutlineVariant` |
-| **Indicators & Badges** | `LinearProgress`, `Badge` | Determinate progress bars and notification count pills/dots |
 | **Dialogs** | `AlertDialog` | Modal dialogs with Scrim backdrop, `SurfaceContainerHigh` panel, title, body, and action buttons |
 | **Side Sheets** | `SideSheet` | Modal side sheet anchored to the right edge: full-height `SurfaceContainerLow` panel with rounded left corners, header, scrolling content, and pinned footer actions. Dims and blocks the content behind it, takes focus, closes on Escape or scrim click |
 | **Capsule Sliders** | `VerticalCapsuleSlider`, `HorizontalCapsuleSlider`, `CapsuleSlider` | Control-Center style wide capsule sliders (72x160 / 220x60) with auto-contrasting interior icon and label |
