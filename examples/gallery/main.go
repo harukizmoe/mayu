@@ -69,6 +69,12 @@ type galleryApp struct {
 	// Text input state
 	username string
 	email    string
+	notes    string
+	city     string
+
+	// Choosing state
+	tabIdx int
+	zone   string
 
 	// Slider & progress state
 	sliderVal      float64
@@ -101,6 +107,10 @@ func newGalleryApp() *galleryApp {
 		radioChoice:    "Standard",
 		username:       "Alex",
 		email:          "alex@example.com",
+		notes:          "A new component batch: tabs, select, autocomplete and a progress ring.",
+		city:           "",
+		tabIdx:         0,
+		zone:           "UTC+8",
 		sliderVal:      60.0,
 		brightnessVal:  65.0,
 		volumeVal:      35.0,

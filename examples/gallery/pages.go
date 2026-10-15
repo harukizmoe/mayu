@@ -100,12 +100,51 @@ func (a *galleryApp) componentsPage(c *ui.Context, t *theme.Theme) {
 		})
 	})
 
-	sec("Text Fields", func() {
+	sec("Text Fields & Areas", func() {
 		ui.Row(c).Gap(20).FillWidth().Children(func() {
-			mayu.FilledTextField(c, &a.username, "Username").
-				Placeholder("Enter username")
-			mayu.OutlinedTextField(c, &a.email, "Email Address").
-				Placeholder("Enter email")
+			ui.Box(c).Grow(1).Children(func() {
+				mayu.FilledTextField(c, &a.username, "Username").
+					Placeholder("Enter username")
+			})
+			ui.Box(c).Grow(1).Children(func() {
+				mayu.OutlinedTextField(c, &a.email, "Email Address").
+					Placeholder("Enter email")
+			})
+		})
+
+		ui.Box(c).MaxWidth(560).Children(func() {
+			mayu.FilledTextArea(c, &a.notes, "Release notes").
+				Placeholder("What changed?")
+		})
+	})
+
+	sec("Tabs", func() {
+		ui.Column(c).Gap(8).Children(func() {
+			ui.Text(c, "One row of labels over a shared line, the chosen segment raised.").
+				TextColor(t.Scheme.OnSurfaceVariant).FontSize(13)
+			mayu.Tabs(c, &a.tabIdx, []string{"Flights", "Trains", "Buses", "Ferries"})
+		})
+	})
+
+	sec("Select & Autocomplete", func() {
+		ui.Row(c).Gap(20).AlignItems(ui.Start).Children(func() {
+			ui.Box(c).Width(300).Children(func() {
+				mayu.Select(c, &a.zone, "Time zone", []mayu.SelectOption[string]{
+					{Value: "UTC", Label: "UTC — Coordinated Universal Time"},
+					{Value: "UTC+8", Label: "UTC+8 — Shanghai"},
+					{Value: "UTC+9", Label: "UTC+9 — Tokyo"},
+					{Value: "UTC-5", Label: "UTC-5 — New York"},
+				})
+			})
+
+			ui.Box(c).Width(260).Children(func() {
+				ac := mayu.Autocomplete(c, &a.city, "City", []string{
+					"Shanghai", "Shenzhen", "Singapore", "Sydney", "Tokyo",
+				})
+				if v, ok := ac.Chosen(); ok {
+					a.lastAction = "Chose the city " + v
+				}
+			})
 		})
 	})
 
@@ -122,11 +161,19 @@ func (a *galleryApp) componentsPage(c *ui.Context, t *theme.Theme) {
 	})
 
 	sec("Sliders & Progress", func() {
-		ui.Column(c).Gap(8).Children(func() {
-			ui.Text(c, fmt.Sprintf("Standard Slider: %.0f%%", a.sliderVal)).
-				TextColor(t.Scheme.OnSurfaceVariant)
+		ui.Column(c).Gap(12).Children(func() {
+			ui.Row(c).Gap(20).AlignItems(ui.Center).Children(func() {
+				mayu.CircularProgress(c, float32(a.sliderVal/100.0),
+					mayu.CircularProgressOptions{ShowValue: true})
+				mayu.CircularProgress(c, -1, mayu.CircularProgressOptions{})
+				ui.Column(c).Grow(1).Gap(8).Children(func() {
+					ui.Text(c, fmt.Sprintf("Slider and linear progress: %.0f%%", a.sliderVal)).
+						TextColor(t.Scheme.OnSurfaceVariant)
+					mayu.LinearProgress(c, float32(a.sliderVal/100.0))
+				})
+			})
+
 			mayu.Slider(c, &a.sliderVal, 0, 100)
-			mayu.LinearProgress(c, float32(a.sliderVal/100.0))
 		})
 	})
 
