@@ -158,3 +158,15 @@ func SchemeFromSeed(seed ui.Color, dark bool) ColorScheme {
 	}
 	return LightScheme(dyn)
 }
+
+// Accents for what stands on a color scheme's InverseSurface, where the
+// scheme's own roles are too dark to read. They are the tones Material 3
+// reserves for that surface.
+var (
+	// InverseSuccess marks what went well, as "Saved".
+	InverseSuccess = ui.Hex("#6DD58C")
+	// InverseError marks what failed, as "Upload failed".
+	InverseError = ui.Hex("#FFB4AB")
+	// InverseWarning marks what calls for care.
+	InverseWarning = ui.Hex("#FFD8A8")
+)

@@ -10,7 +10,7 @@ import (
 func TestGallery_InteractiveFeatures(t *testing.T) {
 	app := newGalleryApp()
 
-	tt := ui.NewTester(app.view, 1200, 1800)
+	tt := ui.NewTester(app.view, 1200, 2600)
 
 	// 1. Verify desktop skeleton and navigation
 	if !tt.HasText("Overview") || !tt.HasText("Favorites") || !tt.HasText("Config") {
@@ -25,6 +25,14 @@ func TestGallery_InteractiveFeatures(t *testing.T) {
 	// 3. Verify capsule sliders
 	if !tt.HasText("开灯") {
 		t.Fatal("Horizontal capsule slider '开灯' not found")
+	}
+
+	// 3b. Verify the labeled slider card and its value badge
+	if !tt.HasText("亮度 (Brightness)") {
+		t.Fatal("labeled slider card not found")
+	}
+	if !tt.HasText("65 %") {
+		t.Fatalf("labeled slider value badge not found, texts: %q", tt.Texts())
 	}
 
 	// 4. Verify list items & avatars
@@ -91,5 +99,14 @@ func TestGallery_InteractiveFeatures(t *testing.T) {
 	}
 	if app.dialogOpen {
 		t.Error("expected dialogOpen == false after confirm")
+	}
+
+	// 13. Toast: clicking a trigger shows it in the host on the next frame.
+	if err := tt.Click("Toast: Success"); err != nil {
+		t.Fatalf("failed clicking the toast trigger: %v", err)
+	}
+	tt.Frame()
+	if !tt.HasText("已保存") {
+		t.Fatalf("the toast does not show, texts: %q", tt.Texts())
 	}
 }

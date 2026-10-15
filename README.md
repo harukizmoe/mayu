@@ -8,7 +8,7 @@
 - **Tonal Elevation**: Z-axis hierarchy represented through surface containers and subtle tonal variations rather than heavy blurred shadows.
 - **M3 State Layers**: Interactive state feedback (Hover 8%, Focus 10%, Pressed 10%) mathematically composited over base containers.
 - **Desktop Density Scale**: Three density tiers (`Standard`, `Compact`, `Comfortable`) for keyboard/mouse desktop ergonomics.
-- **Full Common Component Suite**: Comprehensive implementations of Buttons, Cards, Selection Controls, TextFields, Chips, Sliders, Dialogs, Dividers, and Progress Indicators.
+- **Full Common Component Suite**: Comprehensive implementations of Buttons, Cards, Selection Controls, TextFields, Chips, Sliders, Dialogs, Side Sheets, Dividers, and Progress Indicators.
 - **Fluent Builder API**: Idiomatic Go chaining for components with seamless MyGo `ui.Element` interoperability.
 
 ## Component Catalog
@@ -26,10 +26,13 @@
 | **Dividers** | `HorizontalDivider`, `VerticalDivider` | 1dp hairline separators in `OutlineVariant` |
 | **Indicators & Badges** | `LinearProgress`, `Badge` | Determinate progress bars and notification count pills/dots |
 | **Dialogs** | `AlertDialog` | Modal dialogs with Scrim backdrop, `SurfaceContainerHigh` panel, title, body, and action buttons |
+| **Side Sheets** | `SideSheet` | Modal side sheet anchored to the right edge: full-height `SurfaceContainerLow` panel with rounded left corners, header, scrolling content, and pinned footer actions. Dims and blocks the content behind it, takes focus, closes on Escape or scrim click |
 | **Capsule Sliders** | `VerticalCapsuleSlider`, `HorizontalCapsuleSlider`, `CapsuleSlider` | Control-Center style wide capsule sliders (72x160 / 220x60) with auto-contrasting interior icon and label |
+| **Labeled Slider** | `LabeledSlider` | Card-style slider: header of icon, label and a live value badge above a full-width track with a ringed round thumb |
 | **Navigation** | `NavigationRail`, `SegmentedButton` | 80dp desktop navigation rail with active pill indicator + connected M3 segmented button group |
 | **Lists** | `ListItem` | 3-slot list rows (leading icon/avatar, headline + supporting text, trailing switch/badge) |
 | **Overlays** | `Tooltip`, `Snackbar`, `Menu` | Inverse-surface tooltips, floating feedback pills with action, anchored dropdown menus with shortcuts |
+| **Notifications** | `ToastHost`, `ShowToast`, `CloseToast` | Material 3 toasts: an inverse-surface host holding info/success/error toasts with kind icons, an action and a close button, auto-dismissing |
 | **Media & Structure** | `Avatar`, `InitialsAvatar`, `Accordion`, `SearchBar` | Circular avatars (icon or hash-initials), collapsible panels, and 56dp search pills |
 
 ## Installation
@@ -130,6 +133,7 @@ mayui/
 │   ├── divider.go             // Horizontal & Vertical Dividers
 │   ├── indicator.go           // LinearProgress & Badge
 │   ├── dialog.go              // AlertDialog
+│   ├── side_sheet.go          // SideSheet
 │   └── state_layer.go         // Hover (8%), Focus (10%), Pressed (10%) overlays
 ├── symbols/                   // Standard Material Symbols (SVG)
 └── examples/
