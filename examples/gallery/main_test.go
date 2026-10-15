@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"time"
 
 	"github.com/egoist/mygo/ui"
 	"github.com/harukizmoe/mayu"
@@ -155,6 +156,31 @@ func TestGallery_ToastShapes(t *testing.T) {
 	tt.Frame()
 	if !tt.HasText("Material You 已启用") {
 		t.Fatalf("the inverse-colored toast does not show, texts: %q", tt.Texts())
+	}
+	// Every component of the library must be reachable from the gallery.
+	for _, want := range []string{
+		"Tooltips, Dividers & Icon Buttons",
+		"悬停查看提示",
+		"关闭全部 Toast",
+		"Modal Surfaces",
+		"Open Side Sheet",
+		"Advanced System Configuration",
+	} {
+		if !tt.HasText(want) {
+			t.Errorf("the gallery does not show %q", want)
+		}
+	}
+
+	// A tooltip appears once its anchor has been hovered for its delay.
+	move, ok := tt.Find("悬停查看提示")
+	if !ok {
+		t.Fatal("the chip with a tooltip is not laid out")
+	}
+	tt.Move(move.X+move.W/2, move.Y+move.H/2)
+	time.Sleep(700 * time.Millisecond) // the tooltip's 600ms delay
+	tt.Frame()
+	if !tt.HasText("这是 M3 Tooltip") {
+		t.Fatalf("the tooltip does not show, texts: %q", tt.Texts())
 	}
 }
 

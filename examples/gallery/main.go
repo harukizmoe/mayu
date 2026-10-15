@@ -559,6 +559,34 @@ func (a *galleryApp) view(c *ui.Context) {
 					})
 				})
 
+				// Tooltips, dividers and icon-button variants.
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Tooltips, Dividers & Icon Buttons").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+						for _, ic := range []struct {
+							icon *ui.SVG
+							tip  string
+						}{
+							{symbols.VolumeUp, "音量"},
+							{symbols.Settings, "设置"},
+							{symbols.Favorite, "收藏"},
+							{symbols.Search, "搜索"},
+						} {
+							anchor := mayu.FilledTonalIconButton(c, ic.icon)
+							mayu.Tooltip(c, anchor.Element, ic.tip)
+						}
+
+						mayu.VerticalDivider(c).Height(28)
+
+						chip := mayu.Chip(c, "悬停查看提示").Icon(symbols.Info)
+						mayu.Tooltip(c, chip.Element, "这是 M3 Tooltip")
+
+						mayu.TextButton(c, "关闭全部 Toast").
+							OnClick(func() { mayu.CloseToast(c, "") })
+					})
+				})
+
 				// Modal surfaces: a side sheet anchored to the right edge.
 				ui.Column(c).Gap(12).Children(func() {
 					ui.Text(c, "Modal Surfaces").FontSize(theme.TitleMedium.Size).Bold()
