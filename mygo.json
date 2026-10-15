@@ -1,0 +1,8 @@
+{
+  "name": "Mayu Gallery",
+  "identifier": "com.harukizmoe.mayu.gallery",
+  "version": "0.1.0",
+  "copyright": "MIT licensed",
+  "main": "./examples/gallery",
+  "out": "dist"
+}
