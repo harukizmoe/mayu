@@ -31,6 +31,11 @@ type galleryApp struct {
 	clicks     int
 	lastAction string
 
+	// Navigation & segmented state
+	railIndex      int
+	segmentedIndex int
+	searchQuery    string
+
 	// Selection state
 	checkboxVal bool
 	switchVal   bool
@@ -46,26 +51,37 @@ type galleryApp struct {
 	volumeVal      float64
 	lightSwitchVal float64
 
-	// Dialog state
-	dialogOpen bool
+	// Overlay states
+	accordionOpen bool
+	menuOpen      bool
+	dialogOpen    bool
+	snackbarOpen  bool
+	snackbarMsg   string
 }
 
 func newGalleryApp() *galleryApp {
 	return &galleryApp{
-		seedIndex:   0,
-		dark:        false,
-		density:     mayu.DensityStandard,
-		lastAction:  "Ready",
-		checkboxVal: true,
-		switchVal:   true,
-		radioChoice: "Standard",
-		username:    "Alex",
+		seedIndex:      0,
+		dark:           false,
+		density:        mayu.DensityStandard,
+		lastAction:     "Ready",
+		railIndex:      0,
+		segmentedIndex: 0,
+		searchQuery:    "",
+		checkboxVal:    true,
+		switchVal:      true,
+		radioChoice:    "Standard",
+		username:       "Alex",
 		email:          "alex@example.com",
 		sliderVal:      60.0,
 		brightnessVal:  65.0,
 		volumeVal:      35.0,
 		lightSwitchVal: 80.0,
+		accordionOpen:  true,
+		menuOpen:       false,
 		dialogOpen:     false,
+		snackbarOpen:   false,
+		snackbarMsg:    "Settings saved successfully",
 	}
 }
 
@@ -80,21 +96,43 @@ func (a *galleryApp) view(c *ui.Context) {
 	})
 	scheme := t.Scheme
 
-	// Outer scrollable container
-	ui.Scroll(c).Fill().Children(func() {
-		ui.Column(c).FillWidth().Padding(24).Gap(20).Children(func() {
-			// Header row
-			ui.Row(c).AlignItems(ui.Center).Justify(ui.SpaceBetween).Children(func() {
-				ui.Column(c).Gap(4).Children(func() {
-					ui.Row(c).Gap(10).AlignItems(ui.Center).Children(func() {
-						ui.Text(c, "Mayu Component Gallery").FontSize(theme.HeadlineMedium.Size).Bold()
-						mayu.Badge(c, 12)
-					})
-					ui.Text(c, "Material Design 3 (Material You) UI Toolkit for MyGo").TextColor(scheme.OnSurfaceVariant)
+	// Top-level layout: Navigation Rail on left, Scrollable content on right
+	ui.Row(c).Fill().Children(func() {
+		// ==========================================
+		// Left: Navigation Rail (Desktop Skeleton)
+		// ==========================================
+		mayu.NavigationRail(c, mayu.NavigationRailOptions{
+			Selected: &a.railIndex,
+			Header: func() {
+				mayu.FAB(c, symbols.Add).OnClick(func() {
+					a.clicks++
+					a.lastAction = "Clicked Rail FAB"
 				})
+			},
+			Destinations: []mayu.NavDestination{
+				{Icon: symbols.Send, Label: "Overview", Badge: 3},
+				{Icon: symbols.Favorite, Label: "Favorites"},
+				{Icon: symbols.Settings, Label: "Config"},
+			},
+			Footer: func() {
+				mayu.InitialsAvatar(c, "Mayu User")
+			},
+			OnSelect: func(idx int) {
+				a.lastAction = fmt.Sprintf("Switched to Tab %d", idx)
+			},
+		})
 
-				// Mode & Density controls
-				ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+		// ==========================================
+		// Right: Scrollable Main Content
+		// ==========================================
+		ui.Scroll(c).Grow(1).FillHeight().Children(func() {
+			ui.Column(c).FillWidth().Padding(24).Gap(20).Children(func() {
+				// Search Bar & Header
+				ui.Row(c).AlignItems(ui.Center).Gap(16).FillWidth().Children(func() {
+					mayu.SearchBar(c, &a.searchQuery, "Search Mayu components...").
+						Grow(1)
+
+					// Density & Theme Mode Controls
 					densityLabel := "Standard"
 					if a.density == mayu.DensityCompact {
 						densityLabel = "Compact"
@@ -125,241 +163,299 @@ func (a *galleryApp) view(c *ui.Context) {
 							a.dark = !a.dark
 						})
 				})
-			})
 
-			// 1. Seed Color Row
-			ui.Column(c).Gap(8).Children(func() {
-				ui.Text(c, "Dynamic Seed Color").FontSize(theme.TitleMedium.Size).Bold()
-				ui.Row(c).Gap(8).Children(func() {
-					for i, s := range presetSeeds {
-						idx := i
-						btn := mayu.OutlinedButton(c, s.name)
-						if idx == a.seedIndex {
-							btn = mayu.FilledButton(c, s.name)
+				// 1. Dynamic Seed Colors
+				ui.Column(c).Gap(8).Children(func() {
+					ui.Text(c, "Dynamic Seed Color").FontSize(theme.TitleMedium.Size).Bold()
+					ui.Row(c).Gap(8).Children(func() {
+						for i, s := range presetSeeds {
+							idx := i
+							btn := mayu.OutlinedButton(c, s.name)
+							if idx == a.seedIndex {
+								btn = mayu.FilledButton(c, s.name)
+							}
+							btn.OnClick(func() {
+								a.seedIndex = idx
+								a.lastAction = fmt.Sprintf("Switched seed to %s", s.name)
+							})
 						}
-						btn.OnClick(func() {
-							a.seedIndex = idx
-							a.lastAction = fmt.Sprintf("Switched seed to %s", s.name)
-						})
-					}
-				})
-			})
-
-			mayu.HorizontalDivider(c)
-
-			// 2. Buttons & FAB Section
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Buttons & Floating Actions").FontSize(theme.TitleMedium.Size).Bold()
-
-				ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
-					mayu.FilledButton(c, "Filled Button").
-						Icon(symbols.Send).
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Filled Button"
-						})
-
-					mayu.ElevatedButton(c, "Elevated Button").
-						Icon(symbols.Add).
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Elevated Button"
-						})
-
-					mayu.FilledTonalButton(c, "Filled Tonal").
-						Icon(symbols.Favorite).
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Filled Tonal Button"
-						})
-
-					mayu.OutlinedButton(c, "Outlined").
-						Icon(symbols.Settings).
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Outlined Button"
-						})
-
-					mayu.TextButton(c, "Text Button").
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Text Button"
-						})
+					})
 				})
 
-				// FABs & IconButtons Row
-				ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
-					mayu.ExtendedFAB(c, symbols.Add, "Compose").
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked Extended FAB"
-						})
+				mayu.HorizontalDivider(c)
 
-					mayu.FAB(c, symbols.Favorite).
-						OnClick(func() {
-							a.clicks++
-							a.lastAction = "Clicked FAB"
-						})
-
-					mayu.IconButton(c, symbols.Search).
-						OnClick(func() {
-							a.lastAction = "Clicked IconButton"
-						})
-
-					mayu.FilledIconButton(c, symbols.Settings).
-						OnClick(func() {
-							a.lastAction = "Clicked FilledIconButton"
-						})
-
-					mayu.FilledTonalIconButton(c, symbols.Send).
-						OnClick(func() {
-							a.lastAction = "Clicked FilledTonalIconButton"
-						})
-
-					mayu.OutlinedIconButton(c, symbols.Close).
-						OnClick(func() {
-							a.lastAction = "Clicked OutlinedIconButton"
-						})
+				// 2. Segmented Buttons (Timeline / Filter)
+				ui.Column(c).Gap(10).Children(func() {
+					ui.Text(c, "Segmented Button (M3 View Switcher)").FontSize(theme.TitleMedium.Size).Bold()
+					mayu.SegmentedButton(c, &a.segmentedIndex, []mayu.SegmentOption{
+						{Label: "Daily", Icon: symbols.LightMode},
+						{Label: "Weekly"},
+						{Label: "Monthly"},
+						{Label: "Yearly"},
+					})
 				})
-			})
 
-			mayu.HorizontalDivider(c)
+				mayu.HorizontalDivider(c)
 
-			// 3. Selection Controls Section
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Selection Controls").FontSize(theme.TitleMedium.Size).Bold()
+				// 3. Capsule Sliders (Control Center / 宽体胶囊滑动条)
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Capsule Sliders (Control Center / 宽体胶囊滑动条)").FontSize(theme.TitleMedium.Size).Bold()
 
-				ui.Row(c).Gap(24).AlignItems(ui.Center).Children(func() {
-					mayu.Checkbox(c, &a.checkboxVal, "Enable notifications")
+					ui.Row(c).Gap(24).AlignItems(ui.Center).Children(func() {
+						// Vertical Brightness Capsule
+						ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
+							mayu.VerticalCapsuleSlider(c, &a.brightnessVal, 0, 100, symbols.Lightbulb)
+							ui.Text(c, fmt.Sprintf("亮度 %.0f%%", a.brightnessVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+						})
 
-					mayu.Switch(c, &a.switchVal, "Airplane mode")
+						// Vertical Volume Capsule
+						ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
+							mayu.VerticalCapsuleSlider(c, &a.volumeVal, 0, 100, symbols.VolumeUp)
+							ui.Text(c, fmt.Sprintf("音量 %.0f%%", a.volumeVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+						})
+
+						// Horizontal Wide Capsule ("开灯")
+						ui.Column(c).Gap(12).Justify(ui.Center).Children(func() {
+							ui.Text(c, "Wide Horizontal Capsule Slider").FontSize(theme.TitleSmall.Size).Bold()
+							mayu.HorizontalCapsuleSlider(c, &a.lightSwitchVal, 0, 100, symbols.LightMode, "开灯")
+							ui.Text(c, fmt.Sprintf("开关滑块档位: %.0f%%", a.lightSwitchVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+						})
+					})
+				})
+
+				mayu.HorizontalDivider(c)
+
+				// 4. Buttons & Floating Actions
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Buttons & Floating Actions").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Row(c).Gap(12).AlignItems(ui.Center).Children(func() {
+						mayu.FilledButton(c, "Filled Button").
+							Icon(symbols.Send).
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Filled Button"
+							})
+
+						mayu.ElevatedButton(c, "Elevated Button").
+							Icon(symbols.Add).
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Elevated Button"
+							})
+
+						mayu.FilledTonalButton(c, "Filled Tonal").
+							Icon(symbols.Favorite).
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Filled Tonal Button"
+							})
+
+						mayu.OutlinedButton(c, "Outlined").
+							Icon(symbols.Settings).
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Outlined Button"
+							})
+
+						mayu.TextButton(c, "Text Button").
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Text Button"
+							})
+					})
+
+					// Extended FAB & Icon Buttons Row
+					ui.Row(c).Gap(16).AlignItems(ui.Center).Children(func() {
+						mayu.ExtendedFAB(c, symbols.Add, "Compose").
+							OnClick(func() {
+								a.clicks++
+								a.lastAction = "Clicked Extended FAB"
+							})
+
+						mayu.IconButton(c, symbols.Search).
+							OnClick(func() { a.lastAction = "Clicked IconButton" })
+
+						mayu.FilledIconButton(c, symbols.Settings).
+							OnClick(func() { a.lastAction = "Clicked FilledIconButton" })
+
+						menuAnchor := mayu.OutlinedIconButton(c, symbols.Close).
+							OnClick(func() {
+								a.menuOpen = !a.menuOpen
+							})
+
+						// Dropdown Menu anchored to icon button
+						mayu.Menu(c, menuAnchor.Element, &a.menuOpen, func(m *mayu.MenuPanel) {
+							m.Item("Copy Link", mayu.MenuItemOptions{
+								Icon:     symbols.Send,
+								Shortcut: "⌘C",
+								OnClick: func() {
+									a.lastAction = "Menu Item Copy Link"
+									a.snackbarOpen = true
+									a.snackbarMsg = "Copied to clipboard"
+								},
+							})
+							m.Divider()
+							m.Item("Settings", mayu.MenuItemOptions{
+								Icon: symbols.Settings,
+								OnClick: func() {
+									a.lastAction = "Menu Item Settings"
+								},
+							})
+						})
+					})
+				})
+
+				mayu.HorizontalDivider(c)
+
+				// 5. List Items (Settings / Content items)
+				ui.Column(c).Gap(8).Children(func() {
+					ui.Text(c, "List Items & Avatars").FontSize(theme.TitleMedium.Size).Bold()
+
+					mayu.ListItem(c, "Sarah Connor", mayu.ListItemOptions{
+						SupportingText: "Online • Cyberdyne Systems",
+						Leading: func() {
+							mayu.InitialsAvatar(c, "Sarah Connor")
+						},
+						Trailing: func() {
+							mayu.Badge(c, 2)
+						},
+						OnClick: func() {
+							a.lastAction = "Clicked Sarah Connor ListItem"
+						},
+					})
+
+					mayu.ListItem(c, "Airplane Mode", mayu.ListItemOptions{
+						SupportingText: "Disable Wi-Fi, Bluetooth and Cellular",
+						Leading: func() {
+							mayu.Avatar(c, symbols.Settings)
+						},
+						Trailing: func() {
+							mayu.Switch(c, &a.switchVal, "")
+						},
+					})
+				})
+
+				mayu.HorizontalDivider(c)
+
+				// 6. Accordion (Collapsible Panel)
+				ui.Column(c).Gap(10).Children(func() {
+					ui.Text(c, "Accordion / Collapsible Panel").FontSize(theme.TitleMedium.Size).Bold()
+
+					mayu.Accordion(c, &a.accordionOpen, "Advanced System Configuration", func() {
+						ui.Column(c).Gap(10).Children(func() {
+							ui.Text(c, "Detailed parameters for graphics pipeline and font rendering engine.").
+								TextColor(scheme.OnSurfaceVariant).FontSize(13)
+
+							ui.Row(c).Gap(16).Children(func() {
+								mayu.Checkbox(c, &a.checkboxVal, "Enable hardware acceleration")
+							})
+						})
+					})
+				})
+
+				mayu.HorizontalDivider(c)
+
+				// 7. Cards & Selection Controls
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Cards & Selection Controls").FontSize(theme.TitleMedium.Size).Bold()
 
 					ui.Row(c).Gap(16).Children(func() {
+						mayu.ElevatedCard(c).Width(240).Children(func() {
+							ui.Column(c).Gap(6).Children(func() {
+								ui.Text(c, "Elevated Card").FontSize(theme.TitleMedium.Size).Bold()
+								ui.Text(c, "SurfaceContainerLow with resting elevation shadow.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
+							})
+						}).OnClick(func() { a.lastAction = "Clicked Elevated Card" })
+
+						mayu.FilledCard(c).Width(240).Children(func() {
+							ui.Column(c).Gap(6).Children(func() {
+								ui.Text(c, "Filled Card").FontSize(theme.TitleMedium.Size).Bold()
+								ui.Text(c, "SurfaceContainerHighest without elevation shadow.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
+							})
+						}).OnClick(func() { a.lastAction = "Clicked Filled Card" })
+
+						mayu.OutlinedCard(c).Width(240).Children(func() {
+							ui.Column(c).Gap(6).Children(func() {
+								ui.Text(c, "Outlined Card").FontSize(theme.TitleMedium.Size).Bold()
+								ui.Text(c, "Surface with 1dp OutlineVariant clean border.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
+							})
+						}).OnClick(func() { a.lastAction = "Clicked Outlined Card" })
+					})
+
+					ui.Row(c).Gap(20).AlignItems(ui.Center).Children(func() {
+						mayu.Checkbox(c, &a.checkboxVal, "Enable notifications")
+						mayu.Switch(c, &a.switchVal, "Airplane mode")
 						mayu.Radio(c, &a.radioChoice, "Standard", "Standard Tier")
 						mayu.Radio(c, &a.radioChoice, "Pro", "Pro Tier")
 					})
 				})
-			})
 
-			mayu.HorizontalDivider(c)
+				mayu.HorizontalDivider(c)
 
-			// 4. Cards Section
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Cards (Tonal Elevation)").FontSize(theme.TitleMedium.Size).Bold()
+				// 8. Text Fields Section
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Text Fields").FontSize(theme.TitleMedium.Size).Bold()
 
-				ui.Row(c).Gap(16).Children(func() {
-					mayu.ElevatedCard(c).Width(240).Children(func() {
-						ui.Column(c).Gap(6).Children(func() {
-							ui.Text(c, "Elevated Card").FontSize(theme.TitleMedium.Size).Bold()
-							ui.Text(c, "SurfaceContainerLow with resting elevation shadow.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
-						})
-					}).OnClick(func() {
-						a.lastAction = "Clicked Elevated Card"
-					})
+					ui.Row(c).Gap(20).FillWidth().Children(func() {
+						mayu.FilledTextField(c, &a.username, "Username").
+							Placeholder("Enter username")
 
-					mayu.FilledCard(c).Width(240).Children(func() {
-						ui.Column(c).Gap(6).Children(func() {
-							ui.Text(c, "Filled Card").FontSize(theme.TitleMedium.Size).Bold()
-							ui.Text(c, "SurfaceContainerHighest without elevation shadow.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
-						})
-					}).OnClick(func() {
-						a.lastAction = "Clicked Filled Card"
-					})
-
-					mayu.OutlinedCard(c).Width(240).Children(func() {
-						ui.Column(c).Gap(6).Children(func() {
-							ui.Text(c, "Outlined Card").FontSize(theme.TitleMedium.Size).Bold()
-							ui.Text(c, "Surface with 1dp OutlineVariant clean border.").TextColor(scheme.OnSurfaceVariant).FontSize(13)
-						})
-					}).OnClick(func() {
-						a.lastAction = "Clicked Outlined Card"
+						mayu.OutlinedTextField(c, &a.email, "Email Address").
+							Placeholder("Enter email")
 					})
 				})
-			})
-			mayu.HorizontalDivider(c)
 
-			// Capsule Sliders Section (Control Center / 宽体胶囊滑动条)
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Capsule Sliders (Control Center / 宽体胶囊滑动条)").FontSize(theme.TitleMedium.Size).Bold()
+				mayu.HorizontalDivider(c)
 
-				ui.Row(c).Gap(24).AlignItems(ui.Center).Children(func() {
-					// 1. Vertical Brightness Slider
-					ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
-						mayu.VerticalCapsuleSlider(c, &a.brightnessVal, 0, 100, symbols.Lightbulb)
-						ui.Text(c, fmt.Sprintf("亮度 %.0f%%", a.brightnessVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+				// 9. Chips, Sliders & Progress Section
+				ui.Column(c).Gap(12).Children(func() {
+					ui.Text(c, "Chips, Sliders & Progress").FontSize(theme.TitleMedium.Size).Bold()
+
+					ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
+						mayu.Chip(c, "Action Chip").
+							Icon(symbols.Settings).
+							OnClick(func() { a.lastAction = "Clicked Action Chip" })
+
+						mayu.FilterChip(c, "Filter (Active)", true).
+							OnClick(func() { a.lastAction = "Toggled Filter Chip" })
+
+						mayu.FilterChip(c, "Filter (Inactive)", false).
+							OnClick(func() { a.lastAction = "Toggled Inactive Filter Chip" })
 					})
 
-					// 2. Vertical Volume Slider
-					ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
-						mayu.VerticalCapsuleSlider(c, &a.volumeVal, 0, 100, symbols.VolumeUp)
-						ui.Text(c, fmt.Sprintf("音量 %.0f%%", a.volumeVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
-					})
+					ui.Column(c).Gap(8).Children(func() {
+						ui.Row(c).AlignItems(ui.Center).Justify(ui.SpaceBetween).Children(func() {
+							ui.Text(c, fmt.Sprintf("Standard Slider: %.0f%%", a.sliderVal))
+							mayu.Button(c, "Open Alert Dialog", mayu.VariantFilledTonal).
+								OnClick(func() {
+									a.dialogOpen = true
+								})
+						})
 
-					// 3. Horizontal Wide Capsule Slider (like the "开灯" light switch in screenshot)
-					ui.Column(c).Gap(12).Justify(ui.Center).Children(func() {
-						ui.Text(c, "Wide Horizontal Capsule Slider").FontSize(theme.TitleSmall.Size).Bold()
-						mayu.HorizontalCapsuleSlider(c, &a.lightSwitchVal, 0, 100, symbols.LightMode, "开灯")
-						ui.Text(c, fmt.Sprintf("开关滑块档位: %.0f%%", a.lightSwitchVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+						mayu.Slider(c, &a.sliderVal, 0, 100)
+						mayu.LinearProgress(c, float32(a.sliderVal/100.0))
 					})
 				})
-			})
 
-			mayu.HorizontalDivider(c)
+				// Snackbar trigger
+				if a.snackbarOpen {
+					mayu.Snackbar(c, a.snackbarMsg, mayu.SnackbarOptions{
+						ActionText: "Dismiss",
+						OnAction: func() {
+							a.snackbarOpen = false
+						},
+					})
+				}
 
-			// 5. Text Fields Section
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Text Fields").FontSize(theme.TitleMedium.Size).Bold()
-
-				ui.Row(c).Gap(20).FillWidth().Children(func() {
-					mayu.FilledTextField(c, &a.username, "Username").
-						Placeholder("Enter username")
-
-					mayu.OutlinedTextField(c, &a.email, "Email Address").
-						Placeholder("Enter email")
-				})
-			})
-
-			mayu.HorizontalDivider(c)
-
-			// 6. Chips, Slider & Progress Section
-			ui.Column(c).Gap(12).Children(func() {
-				ui.Text(c, "Chips, Sliders & Progress").FontSize(theme.TitleMedium.Size).Bold()
-
-				// Chips row
+				// Status footer
 				ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-					mayu.Chip(c, "Action Chip").
-						Icon(symbols.Settings).
-						OnClick(func() { a.lastAction = "Clicked Action Chip" })
-
-					mayu.FilterChip(c, "Filter (Active)", true).
-						OnClick(func() { a.lastAction = "Toggled Filter Chip" })
-
-					mayu.FilterChip(c, "Filter (Inactive)", false).
-						OnClick(func() { a.lastAction = "Toggled Inactive Filter Chip" })
+					ui.Text(c, fmt.Sprintf("Clicks: %d", a.clicks)).Bold()
+					ui.Text(c, "•").TextColor(scheme.Outline)
+					ui.Text(c, fmt.Sprintf("Tab=%d, Segment=%d, Tier=%s", a.railIndex, a.segmentedIndex, a.radioChoice)).TextColor(scheme.OnSurfaceVariant)
+					ui.Text(c, "•").TextColor(scheme.Outline)
+					ui.Text(c, fmt.Sprintf("Status: %s", a.lastAction)).TextColor(scheme.Primary)
 				})
-
-				// Slider & Progress
-				ui.Column(c).Gap(8).Children(func() {
-					ui.Row(c).AlignItems(ui.Center).Justify(ui.SpaceBetween).Children(func() {
-						ui.Text(c, fmt.Sprintf("Volume Level: %.0f%%", a.sliderVal))
-						mayu.Button(c, "Open Alert Dialog", mayu.VariantFilledTonal).
-							OnClick(func() {
-								a.dialogOpen = true
-							})
-					})
-
-					mayu.Slider(c, &a.sliderVal, 0, 100)
-					mayu.LinearProgress(c, float32(a.sliderVal/100.0))
-				})
-			})
-
-			// Footer Status Row
-			ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-				ui.Text(c, fmt.Sprintf("Clicks: %d", a.clicks)).Bold()
-				ui.Text(c, "•").TextColor(scheme.Outline)
-				ui.Text(c, fmt.Sprintf("Selection: Checkbox=%v, Switch=%v, Tier=%s", a.checkboxVal, a.switchVal, a.radioChoice)).TextColor(scheme.OnSurfaceVariant)
-				ui.Text(c, "•").TextColor(scheme.Outline)
-				ui.Text(c, fmt.Sprintf("Status: %s", a.lastAction)).TextColor(scheme.Primary)
 			})
 		})
 	})
@@ -382,8 +478,8 @@ func main() {
 	mygo.App.WhenReady(func() {
 		mygo.NewWindow(mygo.WindowOptions{
 			Title:   "Mayu — Material 3 UI for MyGo",
-			Width:   960,
-			Height:  720,
+			Width:   1080,
+			Height:  780,
 			Content: ui.View(app.view),
 		})
 	})

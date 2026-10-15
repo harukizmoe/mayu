@@ -28,6 +28,14 @@ const (
 // Re-exported option types.
 type AlertDialogOptions = components.AlertDialogOptions
 type CapsuleSliderOptions = components.CapsuleSliderOptions
+type SegmentOption = components.SegmentOption
+type ListItemOptions = components.ListItemOptions
+type NavDestination = components.NavDestination
+type NavigationRailOptions = components.NavigationRailOptions
+type SnackbarOptions = components.SnackbarOptions
+type MenuItemOptions = components.MenuItemOptions
+type MenuPanel = components.MenuPanel
+
 // ThemeOptions configures the Material 3 design system for the window.
 type ThemeOptions struct {
 	SeedColor ui.Color
@@ -277,4 +285,66 @@ func Badge(c *ui.Context, count int) ui.Element {
 // AlertDialog renders an M3 Alert Dialog when *open is true.
 func AlertDialog(c *ui.Context, open *bool, opts AlertDialogOptions) ui.Element {
 	return components.AlertDialog(c, open, opts, CurrentTheme(c))
+}
+
+// ==========================================
+// 8. Architecture & Navigation
+// ==========================================
+
+// SegmentedButton creates a connected M3 Segmented Button group.
+func SegmentedButton(c *ui.Context, selected *int, options []SegmentOption) ui.Element {
+	return components.SegmentedButton(c, selected, options, CurrentTheme(c))
+}
+
+// ListItem creates an M3 List Item with slots for leading, supporting text, and trailing.
+func ListItem(c *ui.Context, headline string, opts ListItemOptions) *components.ListItemBuilder {
+	return components.NewListItem(c, headline, opts, CurrentTheme(c))
+}
+
+// NavigationRail creates an M3 vertical desktop navigation rail (80dp width).
+func NavigationRail(c *ui.Context, opts NavigationRailOptions) ui.Element {
+	return components.NavigationRail(c, opts, CurrentTheme(c))
+}
+
+// ==========================================
+// 9. Overlays, Menus & Tooltips
+// ==========================================
+
+// Tooltip attaches an M3 floating tooltip to an anchor element.
+func Tooltip(c *ui.Context, anchor ui.Element, text string) ui.Element {
+	return components.Tooltip(c, anchor, text, CurrentTheme(c))
+}
+
+// Snackbar renders an M3 Snackbar floating feedback pill.
+func Snackbar(c *ui.Context, message string, opts SnackbarOptions) ui.Element {
+	return components.Snackbar(c, message, opts, CurrentTheme(c))
+}
+
+// Menu renders an M3 Dropdown Menu popup anchored to an element when *open is true.
+func Menu(c *ui.Context, anchor ui.Element, open *bool, items func(m *MenuPanel)) ui.Element {
+	return components.Menu(c, anchor, open, items, CurrentTheme(c))
+}
+
+// ==========================================
+// 10. Visual & Content Widgets
+// ==========================================
+
+// Avatar creates a circular M3 Avatar showing an icon.
+func Avatar(c *ui.Context, icon *ui.SVG) *components.AvatarBuilder {
+	return components.Avatar(c, icon, CurrentTheme(c))
+}
+
+// InitialsAvatar creates an M3 Avatar displaying 1-2 initials extracted from name.
+func InitialsAvatar(c *ui.Context, name string) *components.AvatarBuilder {
+	return components.InitialsAvatar(c, name, CurrentTheme(c))
+}
+
+// Accordion creates an M3 collapsible panel with a clickable header and expandable body.
+func Accordion(c *ui.Context, open *bool, title string, content func()) ui.Element {
+	return components.Accordion(c, open, title, content, CurrentTheme(c))
+}
+
+// SearchBar creates an M3 Search Bar (56dp height pill).
+func SearchBar(c *ui.Context, query *string, placeholder string) *components.SearchBarBuilder {
+	return components.NewSearchBar(c, query, placeholder, CurrentTheme(c))
 }
