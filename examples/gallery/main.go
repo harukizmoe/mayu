@@ -78,6 +78,8 @@ type galleryApp struct {
 
 	// Slider & progress state
 	sliderVal      float64
+	priceLow       float64
+	priceHigh      float64
 	brightnessVal  float64
 	volumeVal      float64
 	lightSwitchVal float64
@@ -112,6 +114,8 @@ func newGalleryApp() *galleryApp {
 		tabIdx:         0,
 		zone:           "UTC+8",
 		sliderVal:      60.0,
+		priceLow:       30.0,
+		priceHigh:      75.0,
 		brightnessVal:  65.0,
 		volumeVal:      35.0,
 		lightSwitchVal: 80.0,

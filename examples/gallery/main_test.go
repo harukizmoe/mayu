@@ -149,6 +149,21 @@ func TestGallery_ComponentsPage(t *testing.T) {
 		t.Fatalf("the chip did not act: %q", app.lastAction)
 	}
 
+	// The range slider's thumbs move one at a time.
+	r, ok := tt.Find("Price range")
+	if !ok {
+		t.Fatal("the range slider is not laid out")
+	}
+	cy := r.Y + r.H/2
+	tt.Press(r.X+r.W/5, cy)
+	tt.Release(r.X+r.W/5, cy)
+	if app.priceLow >= 30 {
+		t.Errorf("the lower thumb did not move: %v", app.priceLow)
+	}
+	if app.priceHigh != 75 {
+		t.Errorf("the upper thumb moved instead: %v", app.priceHigh)
+	}
+
 	// A text area holds several lines where a field holds one.
 	if !tt.HasText("Release notes") {
 		t.Fatal("the text area is missing")

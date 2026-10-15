@@ -40,6 +40,7 @@ type MenuPanel = components.MenuPanel
 type SelectOption[T comparable] = components.SelectOption[T]
 type AutocompleteBuilder = components.AutocompleteBuilder
 type CircularProgressOptions = components.CircularProgressOptions
+type RangeSliderOptions = components.RangeSliderOptions
 type ToastOptions = components.ToastOptions
 type ToastHostOptions = components.ToastHostOptions
 type ToastKind = components.ToastKind
@@ -316,6 +317,12 @@ func FilterChip(c *ui.Context, label string, selected bool) *components.ChipBuil
 // Slider constructs an M3 continuous Slider between lo and hi.
 func Slider(c *ui.Context, value *float64, lo, hi float64) *components.SliderBuilder {
 	return components.NewSlider(c, value, lo, hi, CurrentTheme(c))
+}
+
+// RangeSlider constructs an M3 range slider: one track, a thumb at each end of
+// a span, and neither thumb passing the other.
+func RangeSlider(c *ui.Context, low, high *float64, lo, hi float64, opts RangeSliderOptions) ui.Element {
+	return components.RangeSlider(c, low, high, lo, hi, opts, CurrentTheme(c))
 }
 
 // VerticalCapsuleSlider creates an M3/Control Center vertical wide capsule slider (e.g. brightness or volume).
