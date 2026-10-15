@@ -26,6 +26,11 @@
 | **Dividers** | `HorizontalDivider`, `VerticalDivider` | 1dp hairline separators in `OutlineVariant` |
 | **Indicators & Badges** | `LinearProgress`, `Badge` | Determinate progress bars and notification count pills/dots |
 | **Dialogs** | `AlertDialog` | Modal dialogs with Scrim backdrop, `SurfaceContainerHigh` panel, title, body, and action buttons |
+| **Capsule Sliders** | `VerticalCapsuleSlider`, `HorizontalCapsuleSlider`, `CapsuleSlider` | Control-Center style wide capsule sliders (72x160 / 220x60) with auto-contrasting interior icon and label |
+| **Navigation** | `NavigationRail`, `SegmentedButton` | 80dp desktop navigation rail with active pill indicator + connected M3 segmented button group |
+| **Lists** | `ListItem` | 3-slot list rows (leading icon/avatar, headline + supporting text, trailing switch/badge) |
+| **Overlays** | `Tooltip`, `Snackbar`, `Menu` | Inverse-surface tooltips, floating feedback pills with action, anchored dropdown menus with shortcuts |
+| **Media & Structure** | `Avatar`, `InitialsAvatar`, `Accordion`, `SearchBar` | Circular avatars (icon or hash-initials), collapsible panels, and 56dp search pills |
 
 ## Installation
 
