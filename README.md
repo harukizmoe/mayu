@@ -155,3 +155,13 @@ Run unit tests and race detection across all packages:
 ```sh
 go test -race ./...
 ```
+
+## License
+
+[MIT](LICENSE)
+
+## Contributing
+
+`main` only takes merges: work on a branch, open a pull request, squash-merge
+it. [AGENTS.md](AGENTS.md) has the preflight a pull request must pass, the
+branch and commit conventions, and how the packages fit together.
