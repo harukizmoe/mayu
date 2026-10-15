@@ -24,7 +24,8 @@ Commit messages and PR titles use Conventional Commits, in the imperative:
 
 ## Preflight
 
-A pull request must pass all three:
+A pull request must pass all three, and `.github/workflows/ci.yml` runs exactly
+them on every pull request and on `main`:
 
 ```sh
 gofmt -s -l .      # prints nothing
