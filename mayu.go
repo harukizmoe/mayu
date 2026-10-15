@@ -15,6 +15,19 @@ const (
 	DensityComfortable Density = theme.DensityComfortable
 )
 
+type ButtonVariant = components.ButtonVariant
+
+const (
+	VariantFilled      ButtonVariant = components.VariantFilled
+	VariantElevated    ButtonVariant = components.VariantElevated
+	VariantFilledTonal ButtonVariant = components.VariantFilledTonal
+	VariantOutlined    ButtonVariant = components.VariantOutlined
+	VariantText        ButtonVariant = components.VariantText
+)
+
+// Re-exported option types.
+type AlertDialogOptions = components.AlertDialogOptions
+
 // ThemeOptions configures the Material 3 design system for the window.
 type ThemeOptions struct {
 	SeedColor ui.Color
@@ -85,6 +98,15 @@ func Scheme(c *ui.Context) theme.ColorScheme {
 	return CurrentTheme(c).Scheme
 }
 
+// ==========================================
+// 1. Buttons
+// ==========================================
+
+// Button constructs an M3 Button with the specified variant.
+func Button(c *ui.Context, label string, variant ButtonVariant) *components.ButtonBuilder {
+	return components.NewButton(c, label, variant, CurrentTheme(c))
+}
+
 // FilledButton constructs an M3 high-emphasis Filled Button.
 func FilledButton(c *ui.Context, label string) *components.ButtonBuilder {
 	return components.NewButton(c, label, components.VariantFilled, CurrentTheme(c))
@@ -108,4 +130,138 @@ func OutlinedButton(c *ui.Context, label string) *components.ButtonBuilder {
 // TextButton constructs an M3 low-emphasis Text Button.
 func TextButton(c *ui.Context, label string) *components.ButtonBuilder {
 	return components.NewButton(c, label, components.VariantText, CurrentTheme(c))
+}
+
+// FAB constructs a standard 56x56 Floating Action Button.
+func FAB(c *ui.Context, icon *ui.SVG) *components.FABBuilder {
+	return components.NewFAB(c, icon, CurrentTheme(c))
+}
+
+// ExtendedFAB constructs an Extended FAB with icon and label.
+func ExtendedFAB(c *ui.Context, icon *ui.SVG, label string) *components.FABBuilder {
+	return components.NewExtendedFAB(c, icon, label, CurrentTheme(c))
+}
+
+// IconButton constructs a standard circular Icon Button.
+func IconButton(c *ui.Context, icon *ui.SVG) *components.IconButtonBuilder {
+	return components.NewIconButton(c, icon, components.IconButtonStandard, CurrentTheme(c))
+}
+
+// FilledIconButton constructs a filled circular Icon Button.
+func FilledIconButton(c *ui.Context, icon *ui.SVG) *components.IconButtonBuilder {
+	return components.NewIconButton(c, icon, components.IconButtonFilled, CurrentTheme(c))
+}
+
+// FilledTonalIconButton constructs a filled tonal circular Icon Button.
+func FilledTonalIconButton(c *ui.Context, icon *ui.SVG) *components.IconButtonBuilder {
+	return components.NewIconButton(c, icon, components.IconButtonFilledTonal, CurrentTheme(c))
+}
+
+// OutlinedIconButton constructs an outlined circular Icon Button.
+func OutlinedIconButton(c *ui.Context, icon *ui.SVG) *components.IconButtonBuilder {
+	return components.NewIconButton(c, icon, components.IconButtonOutlined, CurrentTheme(c))
+}
+
+// ==========================================
+// 2. Cards
+// ==========================================
+
+// ElevatedCard constructs an M3 Elevated Card with tonal elevation shadow.
+func ElevatedCard(c *ui.Context) *components.CardBuilder {
+	return components.NewCard(c, components.CardElevated, CurrentTheme(c))
+}
+
+// FilledCard constructs an M3 Filled Card using SurfaceContainerHighest.
+func FilledCard(c *ui.Context) *components.CardBuilder {
+	return components.NewCard(c, components.CardFilled, CurrentTheme(c))
+}
+
+// OutlinedCard constructs an M3 Outlined Card with an outline border.
+func OutlinedCard(c *ui.Context) *components.CardBuilder {
+	return components.NewCard(c, components.CardOutlined, CurrentTheme(c))
+}
+
+// ==========================================
+// 3. Selection Controls
+// ==========================================
+
+// Checkbox constructs an M3 Checkbox toggling *checked.
+func Checkbox(c *ui.Context, checked *bool, label string) *components.CheckboxBuilder {
+	return components.NewCheckbox(c, checked, label, CurrentTheme(c))
+}
+
+// Switch constructs an M3 Switch toggling *on.
+func Switch(c *ui.Context, on *bool, label string) *components.SwitchBuilder {
+	return components.NewSwitch(c, on, label, CurrentTheme(c))
+}
+
+// Radio constructs an M3 Radio selecting value into *selected.
+func Radio[T comparable](c *ui.Context, selected *T, value T, label string) *components.RadioBuilder[T] {
+	return components.NewRadio(c, selected, value, label, CurrentTheme(c))
+}
+
+// ==========================================
+// 4. Text Fields
+// ==========================================
+
+// FilledTextField constructs an M3 Filled Text Field.
+func FilledTextField(c *ui.Context, value *string, label string) *components.TextFieldBuilder {
+	return components.NewTextField(c, value, label, components.TextFieldFilled, CurrentTheme(c))
+}
+
+// OutlinedTextField constructs an M3 Outlined Text Field.
+func OutlinedTextField(c *ui.Context, value *string, label string) *components.TextFieldBuilder {
+	return components.NewTextField(c, value, label, components.TextFieldOutlined, CurrentTheme(c))
+}
+
+// ==========================================
+// 5. Chips
+// ==========================================
+
+// Chip constructs an M3 Chip.
+func Chip(c *ui.Context, label string) *components.ChipBuilder {
+	return components.NewChip(c, label, CurrentTheme(c))
+}
+
+// FilterChip constructs an M3 Filter Chip with selection state.
+func FilterChip(c *ui.Context, label string, selected bool) *components.ChipBuilder {
+	return components.NewChip(c, label, CurrentTheme(c)).Selected(selected)
+}
+
+// ==========================================
+// 6. Sliders & Dividers
+// ==========================================
+
+// Slider constructs an M3 continuous Slider between lo and hi.
+func Slider(c *ui.Context, value *float64, lo, hi float64) *components.SliderBuilder {
+	return components.NewSlider(c, value, lo, hi, CurrentTheme(c))
+}
+
+// HorizontalDivider creates a 1dp horizontal separator line.
+func HorizontalDivider(c *ui.Context) ui.Element {
+	return components.HorizontalDivider(c, CurrentTheme(c))
+}
+
+// VerticalDivider creates a 1dp vertical separator line.
+func VerticalDivider(c *ui.Context) ui.Element {
+	return components.VerticalDivider(c, CurrentTheme(c))
+}
+
+// ==========================================
+// 7. Indicators, Badges & Dialogs
+// ==========================================
+
+// LinearProgress creates an M3 Linear Progress bar (progress in 0..1).
+func LinearProgress(c *ui.Context, progress float32) ui.Element {
+	return components.LinearProgress(c, progress, CurrentTheme(c))
+}
+
+// Badge creates an M3 notification badge.
+func Badge(c *ui.Context, count int) ui.Element {
+	return components.Badge(c, count, CurrentTheme(c))
+}
+
+// AlertDialog renders an M3 Alert Dialog when *open is true.
+func AlertDialog(c *ui.Context, open *bool, opts AlertDialogOptions) ui.Element {
+	return components.AlertDialog(c, open, opts, CurrentTheme(c))
 }

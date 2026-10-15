@@ -10,14 +10,21 @@ import (
 func TestGallery_InteractiveFeatures(t *testing.T) {
 	app := newGalleryApp()
 
-	tt := ui.NewTester(app.view, 900, 650)
-
-	// Verify initial elements
-	if !tt.HasText("Mayu UI Gallery") {
+	tt := ui.NewTester(app.view, 1200, 1600)
+	if !tt.HasText("Mayu Component Gallery") {
 		t.Fatal("gallery header not found")
 	}
 	if !tt.HasText("Filled Button") {
 		t.Fatal("Filled Button not found")
+	}
+	if !tt.HasText("Elevated Card") {
+		t.Fatal("Elevated Card not found")
+	}
+	if !tt.HasText("Enable notifications") {
+		t.Fatal("Checkbox label not found")
+	}
+	if !tt.HasText("Airplane mode") {
+		t.Fatal("Switch label not found")
 	}
 
 	// 1. Click "Filled Button" and verify clicks incremented
@@ -50,5 +57,48 @@ func TestGallery_InteractiveFeatures(t *testing.T) {
 	}
 	if app.density != mayu.DensityCompact {
 		t.Errorf("expected density to change to Compact, got %v", app.density)
+	}
+
+	// 5. Click Checkbox to toggle
+	if err := tt.Click("Enable notifications"); err != nil {
+		t.Fatalf("failed clicking Checkbox: %v", err)
+	}
+	if app.checkboxVal {
+		t.Error("expected checkboxVal to toggle to false")
+	}
+
+	// 6. Click Elevated Card
+	if err := tt.Click("Elevated Card"); err != nil {
+		t.Fatalf("failed clicking Elevated Card: %v", err)
+	}
+	if app.lastAction != "Clicked Elevated Card" {
+		t.Errorf("expected lastAction == 'Clicked Elevated Card', got %s", app.lastAction)
+	}
+
+	// 7. Click Extended FAB
+	if err := tt.Click("Compose"); err != nil {
+		t.Fatalf("failed clicking Extended FAB: %v", err)
+	}
+	if app.lastAction != "Clicked Extended FAB" {
+		t.Errorf("expected lastAction == 'Clicked Extended FAB', got %s", app.lastAction)
+	}
+
+	// 8. Open Alert Dialog
+	if err := tt.Click("Open Alert Dialog"); err != nil {
+		t.Fatalf("failed clicking Open Alert Dialog: %v", err)
+	}
+	if !app.dialogOpen {
+		t.Error("expected dialogOpen == true after click")
+	}
+
+	// 9. Confirm dialog
+	if err := tt.Click("Reset"); err != nil {
+		t.Fatalf("failed clicking Reset in dialog: %v", err)
+	}
+	if app.clicks != 0 {
+		t.Errorf("expected clicks reset to 0, got %d", app.clicks)
+	}
+	if app.dialogOpen {
+		t.Error("expected dialogOpen == false after confirm")
 	}
 }

@@ -8,7 +8,24 @@
 - **Tonal Elevation**: Z-axis hierarchy represented through surface containers and subtle tonal variations rather than heavy blurred shadows.
 - **M3 State Layers**: Interactive state feedback (Hover 8%, Focus 10%, Pressed 10%) mathematically composited over base containers.
 - **Desktop Density Scale**: Three density tiers (`Standard`, `Compact`, `Comfortable`) for keyboard/mouse desktop ergonomics.
+- **Full Common Component Suite**: Comprehensive implementations of Buttons, Cards, Selection Controls, TextFields, Chips, Sliders, Dialogs, Dividers, and Progress Indicators.
 - **Fluent Builder API**: Idiomatic Go chaining for components with seamless MyGo `ui.Element` interoperability.
+
+## Component Catalog
+
+| Category | Components | Description |
+|---|---|---|
+| **Buttons** | `FilledButton`, `ElevatedButton`, `FilledTonalButton`, `OutlinedButton`, `TextButton` | 5 M3 emphasis variants with continuous pill radius and leading/trailing icons |
+| **Floating Actions** | `FAB`, `ExtendedFAB` | 56x56 floating action buttons with elevation level 3 |
+| **Icon Buttons** | `IconButton`, `FilledIconButton`, `FilledTonalIconButton`, `OutlinedIconButton` | 40x40 circular icon action buttons |
+| **Cards** | `ElevatedCard`, `FilledCard`, `OutlinedCard` | 12dp rounded cards with tonal surface containers and clickable states |
+| **Selection** | `Checkbox`, `Switch`, `Radio` | M3 toggle controls with responsive state layers and accompanying labels |
+| **Text Inputs** | `FilledTextField`, `OutlinedTextField` | Single-line text inputs with floating labels, placeholders, and error/helper text |
+| **Chips** | `Chip`, `FilterChip` | Compact 32dp action tags and selected filter chips |
+| **Sliders** | `Slider` | Continuous track sliders with active/inactive colored ranges and round thumb |
+| **Dividers** | `HorizontalDivider`, `VerticalDivider` | 1dp hairline separators in `OutlineVariant` |
+| **Indicators & Badges** | `LinearProgress`, `Badge` | Determinate progress bars and notification count pills/dots |
+| **Dialogs** | `AlertDialog` | Modal dialogs with Scrim backdrop, `SurfaceContainerHigh` panel, title, body, and action buttons |
 
 ## Installation
 
@@ -28,7 +45,11 @@ import (
 	"github.com/harukizmoe/mayu/symbols"
 )
 
-type appState struct{}
+type appState struct {
+	checked bool
+	volume  float64
+	text    string
+}
 
 func (s *appState) view(c *ui.Context) {
 	// 1. Initialize M3 Theme with seed color
@@ -39,24 +60,35 @@ func (s *appState) view(c *ui.Context) {
 	})
 
 	// 2. Build fluent M3 components
-	ui.Column(c).Fill().Center().Gap(12).Children(func() {
-		mayu.FilledButton(c, "Submit").
-			Icon(symbols.Send).
-			OnClick(func() {
-				println("Submitted!")
-			})
+	ui.Column(c).Fill().Padding(24).Gap(16).Children(func() {
+		// Buttons
+		ui.Row(c).Gap(12).Children(func() {
+			mayu.FilledButton(c, "Submit").
+				Icon(symbols.Send).
+				OnClick(func() { println("Submitted!") })
 
-		mayu.OutlinedButton(c, "Cancel")
+			mayu.OutlinedButton(c, "Cancel")
+		})
+
+		// Selection Controls
+		mayu.Checkbox(c, &s.checked, "Enable Notifications")
+
+		// Sliders
+		mayu.Slider(c, &s.volume, 0, 100)
+
+		// TextFields
+		mayu.OutlinedTextField(c, &s.text, "Username").
+			Placeholder("Enter username")
 	})
 }
 
 func main() {
-	s := &appState{}
+	s := &appState{volume: 50.0}
 	mygo.App.WhenReady(func() {
 		mygo.NewWindow(mygo.WindowOptions{
 			Title:   "Mayu App",
-			Width:   600,
-			Height:  400,
+			Width:   640,
+			Height:  480,
 			Content: ui.View(s.view),
 		})
 	})
@@ -70,8 +102,8 @@ func main() {
 mayui/
 ├── go.mod                     // github.com/harukizmoe/mayu
 ├── README.md
-├── mayu.go                    // Public facade: Use(), Context injection, button constructors
-├── theme/                     // Design tokens & contracts
+├── mayu.go                    // Public facade: Use(), Context injection, constructors
+├── theme/                     // Design tokens & styling contracts
 │   ├── scheme.go              // ColorScheme (Primary, SurfaceContainer...)
 │   ├── typography.go          // Display, Headline, Title, Body, Label tokens
 │   ├── shape.go               // Corner radius scale (None to Full)
@@ -83,10 +115,20 @@ mayui/
 │   └── dynamic.go             // Seed Color -> 6 Tonal Palettes generator
 ├── components/                // M3 Widget implementations
 │   ├── button.go              // Filled, Elevated, Tonal, Outlined, Text
+│   ├── fab.go                 // FAB, Extended FAB
+│   ├── icon_button.go         // Circular Icon Buttons
+│   ├── card.go                // Elevated, Filled, Outlined Cards
+│   ├── selection.go           // Checkbox, Switch, Radio
+│   ├── text_field.go          // Filled, Outlined TextField
+│   ├── chip.go                // Action Chip, Filter Chip
+│   ├── slider.go              // Continuous Slider
+│   ├── divider.go             // Horizontal & Vertical Dividers
+│   ├── indicator.go           // LinearProgress & Badge
+│   ├── dialog.go              // AlertDialog
 │   └── state_layer.go         // Hover (8%), Focus (10%), Pressed (10%) overlays
 ├── symbols/                   // Standard Material Symbols (SVG)
 └── examples/
-    └── gallery/               // Interactive showcase with live Seed Color picker
+    └── gallery/               // Comprehensive interactive showcase
         └── main.go
 ```
 
