@@ -174,6 +174,16 @@ func (a *galleryApp) componentsPage(c *ui.Context, t *theme.Theme) {
 			})
 
 			mayu.Slider(c, &a.sliderVal, 0, 100)
+
+			ui.Row(c).AlignItems(ui.Center).Justify(ui.SpaceBetween).Children(func() {
+				ui.Text(c, "Range slider").TextColor(t.Scheme.OnSurfaceVariant)
+				ui.Text(c, fmt.Sprintf("%.0f – %.0f", a.priceLow, a.priceHigh)).
+					TextColor(t.Scheme.OnSurfaceVariant)
+			})
+			mayu.RangeSlider(c, &a.priceLow, &a.priceHigh, 0, 100, mayu.RangeSliderOptions{
+				Label: "Price range",
+				Step:  5,
+			})
 		})
 	})
 

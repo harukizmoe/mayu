@@ -24,7 +24,7 @@
 | **Choosing** | `Tabs`, `Select`, `Autocomplete` | A tab row with a raised indicator, a select over a popup of options, and a field whose text filters its suggestions |
 | **Progress** | `LinearProgress`, `CircularProgress`, `Badge` | Determinate progress bars and rings, an indeterminate spinner, and notification badges |
 | **Chips** | `Chip`, `FilterChip` | Compact 32dp action tags and selected filter chips |
-| **Sliders** | `Slider` | Continuous track sliders with active/inactive colored ranges and round thumb |
+| **Sliders** | `Slider`, `RangeSlider` | Continuous track sliders, and a range slider with a thumb at each end of a span that neither passes |
 | **Dividers** | `HorizontalDivider`, `VerticalDivider` | 1dp hairline separators in `OutlineVariant` |
 | **Dialogs** | `AlertDialog` | Modal dialogs with Scrim backdrop, `SurfaceContainerHigh` panel, title, body, and action buttons |
 | **Side Sheets** | `SideSheet` | Modal side sheet anchored to the right edge: full-height `SurfaceContainerLow` panel with rounded left corners, header, scrolling content, and pinned footer actions. Dims and blocks the content behind it, takes focus, closes on Escape or scrim click |
