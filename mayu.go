@@ -27,7 +27,7 @@ const (
 
 // Re-exported option types.
 type AlertDialogOptions = components.AlertDialogOptions
-
+type CapsuleSliderOptions = components.CapsuleSliderOptions
 // ThemeOptions configures the Material 3 design system for the window.
 type ThemeOptions struct {
 	SeedColor ui.Color
@@ -237,7 +237,20 @@ func Slider(c *ui.Context, value *float64, lo, hi float64) *components.SliderBui
 	return components.NewSlider(c, value, lo, hi, CurrentTheme(c))
 }
 
-// HorizontalDivider creates a 1dp horizontal separator line.
+// VerticalCapsuleSlider creates an M3/Control Center vertical wide capsule slider (e.g. brightness or volume).
+func VerticalCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, icon *ui.SVG) *components.CapsuleSliderBuilder {
+	return components.VerticalCapsuleSlider(c, value, lo, hi, icon, CurrentTheme(c))
+}
+
+// HorizontalCapsuleSlider creates a horizontal wide capsule slider with icon and label.
+func HorizontalCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, icon *ui.SVG, label string) *components.CapsuleSliderBuilder {
+	return components.HorizontalCapsuleSlider(c, value, lo, hi, icon, label, CurrentTheme(c))
+}
+
+// CapsuleSlider creates a wide capsule slider with customized options.
+func CapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts CapsuleSliderOptions) *components.CapsuleSliderBuilder {
+	return components.NewCapsuleSlider(c, value, lo, hi, opts, CurrentTheme(c))
+}
 func HorizontalDivider(c *ui.Context) ui.Element {
 	return components.HorizontalDivider(c, CurrentTheme(c))
 }

@@ -41,7 +41,10 @@ type galleryApp struct {
 	email    string
 
 	// Slider & progress state
-	sliderVal float64
+	sliderVal      float64
+	brightnessVal  float64
+	volumeVal      float64
+	lightSwitchVal float64
 
 	// Dialog state
 	dialogOpen bool
@@ -57,9 +60,12 @@ func newGalleryApp() *galleryApp {
 		switchVal:   true,
 		radioChoice: "Standard",
 		username:    "Alex",
-		email:       "alex@example.com",
-		sliderVal:   60.0,
-		dialogOpen:  false,
+		email:          "alex@example.com",
+		sliderVal:      60.0,
+		brightnessVal:  65.0,
+		volumeVal:      35.0,
+		lightSwitchVal: 80.0,
+		dialogOpen:     false,
 	}
 }
 
@@ -267,6 +273,33 @@ func (a *galleryApp) view(c *ui.Context) {
 						})
 					}).OnClick(func() {
 						a.lastAction = "Clicked Outlined Card"
+					})
+				})
+			})
+			mayu.HorizontalDivider(c)
+
+			// Capsule Sliders Section (Control Center / 宽体胶囊滑动条)
+			ui.Column(c).Gap(12).Children(func() {
+				ui.Text(c, "Capsule Sliders (Control Center / 宽体胶囊滑动条)").FontSize(theme.TitleMedium.Size).Bold()
+
+				ui.Row(c).Gap(24).AlignItems(ui.Center).Children(func() {
+					// 1. Vertical Brightness Slider
+					ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
+						mayu.VerticalCapsuleSlider(c, &a.brightnessVal, 0, 100, symbols.Lightbulb)
+						ui.Text(c, fmt.Sprintf("亮度 %.0f%%", a.brightnessVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+					})
+
+					// 2. Vertical Volume Slider
+					ui.Column(c).AlignItems(ui.Center).Gap(8).Children(func() {
+						mayu.VerticalCapsuleSlider(c, &a.volumeVal, 0, 100, symbols.VolumeUp)
+						ui.Text(c, fmt.Sprintf("音量 %.0f%%", a.volumeVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
+					})
+
+					// 3. Horizontal Wide Capsule Slider (like the "开灯" light switch in screenshot)
+					ui.Column(c).Gap(12).Justify(ui.Center).Children(func() {
+						ui.Text(c, "Wide Horizontal Capsule Slider").FontSize(theme.TitleSmall.Size).Bold()
+						mayu.HorizontalCapsuleSlider(c, &a.lightSwitchVal, 0, 100, symbols.LightMode, "开灯")
+						ui.Text(c, fmt.Sprintf("开关滑块档位: %.0f%%", a.lightSwitchVal)).FontSize(12).TextColor(scheme.OnSurfaceVariant)
 					})
 				})
 			})
