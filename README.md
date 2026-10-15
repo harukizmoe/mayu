@@ -2,9 +2,10 @@
 
 **Mayu** is an open-source Material Design 3 (Material You / M3) component library and design system written in pure Go for [MyGo](https://github.com/egoist/mygo)'s native GPU UI toolkit (`mygo/ui`).
 
-**[Open the gallery →](https://harukizmoe.github.io/mayu/)** — the same Go code
-compiled to WebAssembly, so the showcase is the library itself and cannot drift
-from it.
+**[Open the gallery →](https://blog.moeco.fun/mayu/)** (also at
+[harukizmoe.github.io/mayu](https://harukizmoe.github.io/mayu/), which redirects
+there) — the same Go code compiled to WebAssembly, so the showcase is the library
+itself and cannot drift from it.
 
 ## Features
 
