@@ -191,18 +191,31 @@ func (a *galleryApp) view(c *ui.Context) {
 						})
 				})
 
-				// 1. Dynamic Seed Colors
+				// 1. Dynamic Seed Colors: each choice carries a swatch of the
+				// primary its seed generates, so the picker shows the dynamic
+				// color it would put in place.
 				ui.Column(c).Gap(8).Children(func() {
 					ui.Text(c, "Dynamic Seed Color").FontSize(theme.TitleMedium.Size).Bold()
 					ui.Row(c).Gap(8).Children(func() {
 						for i, s := range presetSeeds {
 							idx := i
+							swatch := theme.SchemeFromSeed(s.color, a.dark).Primary
+
+							// One element per seed, restyled when it is the
+							// chosen one: building an outlined button and
+							// replacing it with a filled one would draw the
+							// selected seed twice, the inert copy first.
 							btn := mayu.OutlinedButton(c, s.name)
 							if idx == a.seedIndex {
-								btn = mayu.FilledButton(c, s.name)
+								btn.Variant(mayu.VariantFilled)
 							}
+							btn.Leading(func() {
+								ui.Box(c).Size(14, 14).Radius(7).Shrink(0).
+									Background(swatch).Border(1, scheme.OutlineVariant)
+							})
 							btn.OnClick(func() {
 								a.seedIndex = idx
+								a.clicks++
 								a.lastAction = fmt.Sprintf("Switched seed to %s", s.name)
 							})
 						}

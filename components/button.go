@@ -68,18 +68,40 @@ func NewButton(c *ui.Context, label string, variant ButtonVariant, t *theme.Them
 	return builder
 }
 
+// Variant restyles the button as another of the five Material 3 variants. It
+// lets one button change emphasis — a choice that becomes filled once it is
+// the chosen one, say — without building a second element beside it.
+func (b *ButtonBuilder) Variant(v ButtonVariant) *ButtonBuilder {
+	b.variant = v
+	b.style()
+	return b
+}
+
 // Icon adds a leading Material Symbol / SVG icon to the button.
 func (b *ButtonBuilder) Icon(s *ui.SVG) *ButtonBuilder {
 	if s == nil {
 		return b
 	}
-	// With leading icon, row-reverse displays the prepended child at the start,
-	// and horizontal padding is adjusted per M3 spec (16dp start, 24dp end).
+	return b.Leading(func() { ui.Icon(b.c, s).Size(18, 18) })
+}
+
+// Leading puts build's content before the label, for a leading slot an icon
+// alone cannot draw, as a color swatch:
+//
+//	mayu.FilledButton(c, "Coral Red").Leading(func() {
+//		ui.Box(c).Size(14, 14).Radius(7).Background(coral)
+//	})
+//
+// The row is reversed so the content built here comes first, and the
+// horizontal padding becomes the narrower leading one, as Material 3 asks of
+// a button with a leading slot.
+func (b *ButtonBuilder) Leading(build func()) *ButtonBuilder {
+	if build == nil {
+		return b
+	}
 	b.Element.Reverse()
 	b.Element.Padding(0, b.density.ButtonPaddingX(), 0, b.density.ButtonPaddingXLeadingIcon())
-	b.Element.Children(func() {
-		ui.Icon(b.c, s).Size(18, 18)
-	})
+	b.Element.Children(build)
 	return b
 }
 
@@ -88,10 +110,16 @@ func (b *ButtonBuilder) TrailingIcon(s *ui.SVG) *ButtonBuilder {
 	if s == nil {
 		return b
 	}
+	return b.Trailing(func() { ui.Icon(b.c, s).Size(18, 18) })
+}
+
+// Trailing puts build's content after the label, in a trailing slot of its own.
+func (b *ButtonBuilder) Trailing(build func()) *ButtonBuilder {
+	if build == nil {
+		return b
+	}
 	b.Element.Padding(0, b.density.ButtonPaddingXLeadingIcon(), 0, b.density.ButtonPaddingX())
-	b.Element.Children(func() {
-		ui.Icon(b.c, s).Size(18, 18)
-	})
+	b.Element.Children(build)
 	return b
 }
 

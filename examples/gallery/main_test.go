@@ -158,6 +158,39 @@ func TestGallery_ToastShapes(t *testing.T) {
 	}
 }
 
+func TestGallery_SeedPicker(t *testing.T) {
+	app := newGalleryApp()
+	tt := ui.NewTester(app.view, 1400, 2900)
+
+	// Choosing a seed recolors the window with it.
+	if err := tt.Click("Ocean Blue"); err != nil {
+		t.Fatalf("failed clicking a seed: %v", err)
+	}
+	if app.seedIndex != 2 || app.clicks != 1 {
+		t.Fatalf("expected the Ocean Blue seed from one click, got seed %d after %d clicks",
+			app.seedIndex, app.clicks)
+	}
+
+	// The selected seed's button must still be the one that acts: building an
+	// outlined button and replacing it with a filled one draws the selected
+	// seed twice, with the inert copy first, so this click would do nothing.
+	if err := tt.Click("Ocean Blue"); err != nil {
+		t.Fatalf("failed clicking the selected seed: %v", err)
+	}
+	if app.clicks != 2 {
+		t.Fatalf("the selected seed's button does not act: %d clicks", app.clicks)
+	}
+
+	// And switching away and back keeps working.
+	if err := tt.Click("M3 Purple"); err != nil {
+		t.Fatalf("failed clicking M3 Purple: %v", err)
+	}
+	if app.seedIndex != 0 || app.clicks != 3 {
+		t.Fatalf("expected the M3 Purple seed from a third click, got seed %d after %d clicks",
+			app.seedIndex, app.clicks)
+	}
+}
+
 func TestGallery_SideSheet(t *testing.T) {
 	app := newGalleryApp()
 	tt := ui.NewTester(app.view, 1400, 2900)
