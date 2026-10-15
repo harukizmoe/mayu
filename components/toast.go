@@ -105,47 +105,65 @@ func ToastHost(c *ui.Context, opts ToastHostOptions, t *theme.Theme) ui.Element 
 	})
 }
 
-// styleToast gives one toast the Material 3 look: an inverse-surface pill
-// holding a kind icon, the text, the action and the close button.
+// styleToast gives one toast the Material 3 look: a pill hugging its content,
+// filled with the inverse surface, holding a kind icon, the text, the action
+// and the close button.
 func styleToast(c *ui.Context, parts ui.ToastParts, toast ui.Toast, maxW float32, t *theme.Theme) {
 	scheme := t.Scheme
 
-	root := parts.Root.Row().MaxWidth(maxW).MinHeight(48).Radius(theme.CornerExtraSmall).
-		Padding(8, 16).Gap(12).AlignItems(ui.Center).
+	// A pill's radius is half its height, so the height is fixed and the text
+	// is held to one line: two lines of description make it taller.
+	height := float32(52)
+	textMax := maxW - 170
+	if toast.Description != "" {
+		height = 72
+		textMax = maxW - 190
+	}
+
+	root := parts.Root.Row().MaxWidth(maxW).Height(height).Radius(height/2).
+		Padding(0, 20).Gap(10).AlignItems(ui.Center).
 		Background(scheme.InverseSurface).
-		Shadow(0, 3, 9, 3, scheme.Shadow.Alpha(0.20))
+		Shadow(0, 4, 12, 4, scheme.Shadow.Alpha(0.18))
 
 	opts, _ := toast.Data.(ToastOptions)
 	icon, iconColor := toastIcon(opts, toast.Type, t)
 
 	root.Children(func() {
 		if icon != nil {
-			ui.Icon(c, icon).Size(20, 20).TextColor(iconColor)
+			ui.Icon(c, icon).Size(22, 22).TextColor(iconColor).Shrink(0)
 		}
 
-		ui.Column(c).Grow(1).Justify(ui.Center).Children(func() {
+		ui.Column(c).MaxWidth(textMax).Justify(ui.Center).Gap(2).Children(func() {
 			if toast.Title != "" {
 				ui.Text(c, toast.Title).FontSize(theme.BodyMedium.Size).
-					TextColor(scheme.InverseOnSurface)
+					TextColor(scheme.InverseOnSurface).SingleLine().Ellipsis("…")
 			}
 			if toast.Description != "" {
 				ui.Text(c, toast.Description).FontSize(theme.BodySmall.Size).
-					TextColor(scheme.InverseOnSurface.Alpha(0.78))
+					TextColor(scheme.InverseOnSurface.Alpha(0.75)).SingleLine().Ellipsis("…")
 			}
 		})
 
 		if toast.Action != "" {
-			action := parts.ActionButton().Height(36).Padding(0, 8).Center()
-			action.TextColor(scheme.InversePrimary)
+			action := parts.ActionButton().Height(40).Radius(20).Padding(0, 14).
+				Center().Shrink(0)
+			fg := scheme.InversePrimary
+			action.Background(ApplyStateLayer(ui.Transparent, fg,
+				action.Hovered(), action.Focused(), action.Pressed()))
+			action.TextColor(fg)
 			action.Children(func() {
 				ui.Text(c, toast.Action).FontSize(theme.LabelLarge.Size).Bold().SingleLine()
 			})
 		}
 
 		if opts.Close {
-			closeBtn := parts.CloseButton().Size(32, 32).Radius(16).Center().Label("Close")
+			closeBtn := parts.CloseButton().Size(32, 32).Radius(16).Center().
+				Shrink(0).Label("Close")
+			fg := scheme.InverseOnSurface.Alpha(0.75)
+			closeBtn.Background(ApplyStateLayer(ui.Transparent, fg,
+				closeBtn.Hovered(), closeBtn.Focused(), closeBtn.Pressed()))
 			closeBtn.Children(func() {
-				ui.Icon(c, symbols.Close).Size(18, 18).TextColor(scheme.InverseOnSurface.Alpha(0.78))
+				ui.Icon(c, symbols.Close).Size(18, 18).TextColor(fg)
 			})
 		}
 	})
@@ -190,8 +208,14 @@ func ShowToast(c *ui.Context, opts ToastOptions) string {
 		// An action needs time to reach, as the standard look allows.
 		timeout = 8 * time.Second
 	}
+	id := opts.ID
+	if id == "" {
+		// Naming it by its title makes a repeated toast of the same kind
+		// refresh the one showing instead of piling up.
+		id = opts.Title
+	}
 	return c.AddToast(ui.Toast{
-		ID:          opts.ID,
+		ID:          id,
 		Title:       opts.Title,
 		Description: opts.Description,
 		Type:        opts.Kind.kindName(),
