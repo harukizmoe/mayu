@@ -89,23 +89,16 @@ func NewCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts Capsul
 		density: t.Density,
 	}
 
-	// Resolve capsule colors
+	// The capsule takes the scheme's own roles, so it follows the seed and the
+	// mode rather than a color of its own: a raised container for the empty
+	// track, the primary for what is filled.
 	trackBg := opts.TrackColor
 	if trackBg == (ui.Color{}) {
-		if t.Scheme.Dark {
-			trackBg = ui.Hex("#1E1E1E")
-		} else {
-			trackBg = t.Scheme.SurfaceContainerHighest
-		}
+		trackBg = t.Scheme.SurfaceContainerHighest
 	}
-
 	activeFill := opts.FillColor
 	if activeFill == (ui.Color{}) {
-		if t.Scheme.Dark {
-			activeFill = ui.Hex("#E6E1E5")
-		} else {
-			activeFill = t.Scheme.Primary
-		}
+		activeFill = t.Scheme.Primary
 	}
 
 	// Draw custom filled capsule
@@ -149,21 +142,10 @@ func NewCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts Capsul
 			frac = float32(max(0, min(1, (val-lo)/(hi-lo))))
 		}
 
-		isFillLight := (0.2126*float64(activeFill.R) + 0.7152*float64(activeFill.G) + 0.0722*float64(activeFill.B)) > 128
-		var onFillFg ui.Color
-		if isFillLight {
-			onFillFg = ui.Hex("#1C1B1F")
-		} else {
-			onFillFg = ui.Hex("#FFFFFF")
-		}
-
-		isTrackLight := (0.2126*float64(trackBg.R) + 0.7152*float64(trackBg.G) + 0.0722*float64(trackBg.B)) > 128
-		var onTrackFg ui.Color
-		if isTrackLight {
-			onTrackFg = ui.Hex("#1C1B1F")
-		} else {
-			onTrackFg = ui.Hex("#E6E1E5")
-		}
+		// The icon sits on whichever of the two colors it overlaps, and takes
+		// the role that reads on it.
+		onFillFg := readableOn(activeFill, t.Scheme)
+		onTrackFg := readableOn(trackBg, t.Scheme)
 
 		if opts.Vertical {
 			// Vertical layout: icon centered at bottom
@@ -196,4 +178,23 @@ func NewCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts Capsul
 	})
 
 	return builder
+}
+
+// readableOn returns the scheme role that reads on c: the on-color of the
+// nearest role, so an icon on a capsule is themed rather than black or white by
+// hand. The two roles a capsule is built from are checked first.
+func readableOn(c ui.Color, s theme.ColorScheme) ui.Color {
+	lum := func(v ui.Color) float64 {
+		return 0.2126*float64(v.R) + 0.7152*float64(v.G) + 0.0722*float64(v.B)
+	}
+	switch c {
+	case s.Primary:
+		return s.OnPrimary
+	case s.SurfaceContainerHighest:
+		return s.OnSurface
+	}
+	if lum(c) > 128 {
+		return s.OnSurface
+	}
+	return s.InverseOnSurface
 }
