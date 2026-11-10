@@ -13,7 +13,7 @@ itself and cannot drift from it.
 
 - **Dynamic Color (HCT / CAM16)**: Seed-color-based tonal palette generation implementing Google's CAM16 color appearance model and perceptual $L^*$ Tone matching in pure Go.
 - **Tonal Elevation**: Z-axis hierarchy represented through surface containers and subtle tonal variations rather than heavy blurred shadows.
-- **M3 State Layers**: Interactive state feedback (Hover 8%, Focus 10%, Pressed 10%) mathematically composited over base containers.
+- **M3 State Layers**: Interactive state feedback (Hover 8%, Focus 12%, Pressed 12%) mathematically composited over base containers.
 - **Desktop Density Scale**: Three density tiers (`Standard`, `Compact`, `Comfortable`) for keyboard/mouse desktop ergonomics.
 - **Full Common Component Suite**: Comprehensive implementations of Buttons, Cards, Selection Controls, TextFields, Chips, Sliders, Dialogs, Side Sheets, Dividers, and Progress Indicators.
 - **Fluent Builder API**: Idiomatic Go chaining for components with seamless MyGo `ui.Element` interoperability.

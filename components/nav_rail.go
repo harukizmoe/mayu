@@ -40,7 +40,7 @@ func NavigationRail(c *ui.Context, opts NavigationRailOptions, t *theme.Theme) u
 				idx := i
 				isSelected := opts.Selected != nil && *opts.Selected == idx
 
-				item := ui.Column(c).Width(68).AlignItems(ui.Center).Gap(4).Focusable()
+				item := ui.Column(c).Width(80).AlignItems(ui.Center).Gap(4).Focusable()
 				if item.Clicked() && !item.IsDisabled() {
 					if opts.Selected != nil {
 						*opts.Selected = idx
@@ -80,7 +80,7 @@ func NavigationRail(c *ui.Context, opts NavigationRailOptions, t *theme.Theme) u
 					_ = indicatorNode
 
 					if dest.Label != "" {
-						label := ui.Text(c, dest.Label).FontSize(11).TextColor(labelFg).SingleLine()
+						label := ui.Text(c, dest.Label).FontSize(theme.LabelMedium.Size).TextColor(labelFg).SingleLine()
 						if isSelected {
 							label.Bold()
 						}

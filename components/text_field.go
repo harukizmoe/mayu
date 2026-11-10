@@ -77,14 +77,14 @@ func newField(c *ui.Context, value *string, label string, variant TextFieldVaria
 			box.Radius(4, 4, 0, 0)
 			box.BorderWidth(0, 0, 1, 0).BorderColor(border)
 		default:
-			box.Radius(theme.CornerSmall)
+			box.Radius(theme.CornerExtraSmall)
 			box.Border(1, border)
 		}
 
 		box.Children(func() {
 			inner := ui.Column(c).Grow(1).Gap(4).Children(func() {
 				if label != "" {
-					ui.Text(c, label).FontSize(11).TextColor(t.Scheme.Primary).SingleLine()
+					ui.Text(c, label).FontSize(theme.BodySmall.Size).TextColor(t.Scheme.Primary).SingleLine()
 				}
 				builder.input = fieldInput(c, value, multiline, height, t.Scheme.OnSurface)
 			})

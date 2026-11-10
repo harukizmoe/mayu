@@ -51,7 +51,7 @@ func SideSheet(c *ui.Context, open *bool, opts SideSheetOptions, t *theme.Theme,
 			if opts.Title != "" {
 				ui.Column(c).FillWidth().Padding(24, 20).Gap(4).Children(func() {
 					ui.Text(c, opts.Title).
-						FontSize(theme.TitleLarge.Size).Bold().TextColor(sc.OnSurface)
+						FontSize(theme.TitleLarge.Size).FontWeight(theme.TitleLarge.Weight).TextColor(sc.OnSurface)
 					if opts.Subtitle != "" {
 						ui.Text(c, opts.Subtitle).
 							FontSize(theme.BodyMedium.Size).TextColor(sc.OnSurfaceVariant)

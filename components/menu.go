@@ -41,7 +41,7 @@ func (m *MenuPanel) Item(label string, opts MenuItemOptions) {
 	c := m.c
 	t := m.theme
 
-	row := ui.ButtonBase(c).Height(40).Padding(0, 16).Gap(12).AlignItems(ui.Center).FillWidth()
+	row := ui.ButtonBase(c).Height(48).Padding(0, 12).Gap(12).AlignItems(ui.Center).FillWidth()
 	if opts.Disabled {
 		row.Disabled(true)
 	}

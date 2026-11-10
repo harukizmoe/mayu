@@ -171,7 +171,7 @@ func NewCapsuleSlider(c *ui.Context, value *float64, lo, hi float64, opts Capsul
 					ui.Icon(c, opts.Icon).Size(24, 24).TextColor(contentFg)
 				}
 				if opts.Label != "" {
-					ui.Text(c, opts.Label).FontSize(16).Bold().TextColor(contentFg).SingleLine()
+					ui.Text(c, opts.Label).FontSize(16).FontWeight(theme.TitleMedium.Weight).TextColor(contentFg).SingleLine()
 				}
 			})
 		}

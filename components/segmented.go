@@ -61,7 +61,7 @@ func SegmentedButton(c *ui.Context, selected *int, options []SegmentOption, t *t
 				}
 
 				if opt.Label != "" {
-					ui.Text(c, opt.Label).FontSize(theme.LabelLarge.Size).Bold().SingleLine()
+					ui.Text(c, opt.Label).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 				}
 			})
 		}

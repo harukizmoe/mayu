@@ -60,7 +60,7 @@ func NewButton(c *ui.Context, label string, variant ButtonVariant, t *theme.Them
 	if label != "" {
 		b.Label(label)
 		b.Children(func() {
-			ui.Text(c, label).SingleLine()
+			ui.Text(c, label).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 		})
 	}
 

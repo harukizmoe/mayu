@@ -24,7 +24,7 @@ func Accordion(c *ui.Context, open *bool, title string, content func(), t *theme
 		header.Background(bg)
 
 		header.Children(func() {
-			ui.Text(c, title).FontSize(theme.TitleMedium.Size).Bold().TextColor(t.Scheme.OnSurface).SingleLine()
+			ui.Text(c, title).FontSize(theme.TitleMedium.Size).FontWeight(theme.TitleMedium.Weight).TextColor(t.Scheme.OnSurface).SingleLine()
 
 			// Trailing indicator: Close if open, Add if closed
 			icon := symbols.Add

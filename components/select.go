@@ -28,7 +28,7 @@ func Select[T comparable](c *ui.Context, selected *T, label string, options []Se
 	trigger.Children(func() {
 		ui.Column(c).Grow(1).Justify(ui.Center).Children(func() {
 			if label != "" {
-				ui.Text(c, label).FontSize(11).TextColor(t.Scheme.Primary).SingleLine()
+				ui.Text(c, label).FontSize(theme.BodySmall.Size).TextColor(t.Scheme.Primary).SingleLine()
 			}
 			ui.Text(c, selectLabel(*selected, options)).
 				FontSize(theme.BodyLarge.Size).TextColor(t.Scheme.OnSurface).SingleLine()
