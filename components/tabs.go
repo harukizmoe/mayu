@@ -45,10 +45,7 @@ func Tabs(c *ui.Context, selected *int, labels []string, t *theme.Theme) ui.Elem
 			tab.Children(func() {
 				// Lifted off the line so a descender does not touch it.
 				ui.Column(c).FillHeight().Justify(ui.Center).Padding(0, 0, 6, 0).Children(func() {
-					label := ui.Text(c, name).FontSize(theme.LabelLarge.Size).SingleLine()
-					if chosen {
-						label.Bold()
-					}
+					ui.Text(c, name).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 				})
 			})
 		}

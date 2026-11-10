@@ -34,7 +34,7 @@ func Snackbar(c *ui.Context, message string, opts SnackbarOptions, t *theme.Them
 
 			btn.Background(bg).TextColor(fg)
 			btn.Children(func() {
-				ui.Text(c, opts.ActionText).FontSize(theme.LabelLarge.Size).Bold().SingleLine()
+				ui.Text(c, opts.ActionText).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 			})
 		}
 	})

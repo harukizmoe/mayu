@@ -56,7 +56,7 @@ func NewExtendedFAB(c *ui.Context, icon *ui.SVG, label string, t *theme.Theme) *
 			ui.Icon(c, icon).Size(24, 24)
 		}
 		if label != "" {
-			ui.Text(c, label).FontSize(theme.LabelLarge.Size).Bold().SingleLine()
+			ui.Text(c, label).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 		}
 	})
 

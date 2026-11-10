@@ -33,7 +33,7 @@ func Badge(c *ui.Context, count int, t *theme.Theme) ui.Element {
 
 	pill := ui.Row(c).Height(16).Radius(8).Padding(0, 4).Center().Background(t.Scheme.Error)
 	pill.Children(func() {
-		ui.Text(c, label).FontSize(10).TextColor(t.Scheme.OnError).Bold().SingleLine()
+		ui.Text(c, label).FontSize(10).TextColor(t.Scheme.OnError).FontWeight(theme.LabelSmall.Weight).SingleLine()
 	})
 	return pill
 }

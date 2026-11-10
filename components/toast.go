@@ -49,14 +49,15 @@ const (
 type ToastColor int
 
 const (
+	// ToastInverse fills a toast with InverseSurface and its text with
+	// InverseOnSurface: the classic Material 3 snackbar, which stands out from
+	// the app by turning the theme over. It is the default, as it is in
+	// Material 3.
+	ToastInverse ToastColor = iota
 	// ToastSurface fills a toast with SurfaceContainerHigh, its text with
 	// OnSurface and its action with Primary: a Material You toast that sits in
 	// the app's own colors, as its menus and dialogs do.
-	ToastSurface ToastColor = iota
-	// ToastInverse fills a toast with InverseSurface and its text with
-	// InverseOnSurface: the classic Material 3 snackbar, which stands out from
-	// the app by turning the theme over.
-	ToastInverse
+	ToastSurface
 )
 
 // ToastPlacement is where a ToastHost holds its toasts across the window.
@@ -284,7 +285,7 @@ func styleToast(c *ui.Context, parts ui.ToastParts, toast ui.Toast, shape ToastS
 				action.Hovered(), action.Focused(), action.Pressed()))
 			action.TextColor(pal.action)
 			action.Children(func() {
-				ui.Text(c, toast.Action).FontSize(theme.LabelLarge.Size).Bold().SingleLine()
+				ui.Text(c, toast.Action).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 			})
 		}
 

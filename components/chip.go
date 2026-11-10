@@ -19,7 +19,7 @@ type ChipBuilder struct {
 
 // NewChip constructs an M3 Chip (32dp height, 8dp radius).
 func NewChip(c *ui.Context, label string, t *theme.Theme) *ChipBuilder {
-	b := ui.ButtonBase(c).Height(32).Radius(theme.CornerSmall).Padding(0, 12).Gap(8).Center()
+	b := ui.ButtonBase(c).Height(32).Radius(theme.CornerSmall).Padding(0, 16).Gap(8).Center()
 
 	builder := &ChipBuilder{
 		Element: b,
@@ -33,7 +33,7 @@ func NewChip(c *ui.Context, label string, t *theme.Theme) *ChipBuilder {
 	if label != "" {
 		b.Label(label)
 		b.Children(func() {
-			ui.Text(c, label).FontSize(theme.LabelLarge.Size).SingleLine()
+			ui.Text(c, label).FontSize(theme.LabelLarge.Size).FontWeight(theme.LabelLarge.Weight).SingleLine()
 		})
 	}
 
@@ -47,7 +47,7 @@ func (b *ChipBuilder) Icon(s *ui.SVG) *ChipBuilder {
 	}
 	b.icon = s
 	b.Element.Reverse()
-	b.Element.Padding(0, 12, 0, 8)
+	b.Element.Padding(0, 16, 0, 8)
 	b.Element.Children(func() {
 		ui.Icon(b.c, s).Size(18, 18)
 	})
@@ -60,6 +60,7 @@ func (b *ChipBuilder) Selected(sel bool) *ChipBuilder {
 	b.style()
 	if sel {
 		b.Element.Reverse()
+		b.Element.Padding(0, 16, 0, 8)
 		b.Element.Children(func() {
 			ui.Icon(b.c, symbols.Check).Size(18, 18)
 		})

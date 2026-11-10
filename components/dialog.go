@@ -30,7 +30,7 @@ func AlertDialog(c *ui.Context, open *bool, opts AlertDialogOptions, t *theme.Th
 		ui.Column(c).Gap(16).FillWidth().Children(func() {
 			// Title
 			if opts.Title != "" {
-				ui.Text(c, opts.Title).FontSize(theme.HeadlineSmall.Size).Bold().TextColor(t.Scheme.OnSurface)
+				ui.Text(c, opts.Title).FontSize(theme.HeadlineSmall.Size).FontWeight(theme.HeadlineSmall.Weight).TextColor(t.Scheme.OnSurface)
 			}
 
 			// Body text

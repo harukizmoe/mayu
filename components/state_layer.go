@@ -7,8 +7,8 @@ import (
 // StateLayer opacities defined by Material Design 3.
 const (
 	StateHoverAlpha   float32 = 0.08
-	StateFocusAlpha   float32 = 0.10
-	StatePressedAlpha float32 = 0.10
+	StateFocusAlpha   float32 = 0.12
+	StatePressedAlpha float32 = 0.12
 	StateDraggedAlpha float32 = 0.16
 
 	DisabledContainerAlpha float32 = 0.12
