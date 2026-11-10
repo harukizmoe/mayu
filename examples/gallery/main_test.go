@@ -73,7 +73,7 @@ func TestGallery_SearchFiltersThePage(t *testing.T) {
 	tt := ui.NewTester(app.view, 1400, 1800)
 
 	// Typing into the box finds it by the name it gives assistive technology.
-	if err := tt.Click("Filter this page's components..."); err != nil {
+	if err := tt.Click("Filter components..."); err != nil {
 		t.Fatalf("the search box is not reachable: %v", err)
 	}
 	tt.Type("Chips")
@@ -235,8 +235,8 @@ func TestGallery_OverlaysPage(t *testing.T) {
 	if err := tt.Click("Corner"); err != nil {
 		t.Fatalf("failed clicking the Corner segment: %v", err)
 	}
-	if err := tt.Click("Inverse"); err != nil {
-		t.Fatalf("failed clicking the Inverse segment: %v", err)
+	if err := tt.Click("Surface"); err != nil {
+		t.Fatalf("failed clicking the Surface segment: %v", err)
 	}
 	if app.toastShape != 1 || app.toastColor != 1 {
 		t.Fatalf("the toast options did not change: shape=%d color=%d", app.toastShape, app.toastColor)
@@ -308,7 +308,7 @@ func TestGallery_ThemePage(t *testing.T) {
 	}
 
 	// The elevation swatches and the type scale are shown.
-	for _, want := range []string{"SurfaceContainerLowest", "SurfaceContainerHighest", "HeadlineMedium"} {
+	for _, want := range []string{"Lowest", "Highest", "HeadlineMedium"} {
 		if !tt.HasText(want) {
 			t.Errorf("the Theme page lacks %q", want)
 		}
