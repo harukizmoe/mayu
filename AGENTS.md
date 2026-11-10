@@ -22,6 +22,22 @@ than landing. The squash merge gives `main` one commit per change.
 Commit messages and PR titles use Conventional Commits, in the imperative:
 `fix(segmented): share the track width between segments`.
 
+## Releases
+
+Every release is a patch on the `0.1` line: `v0.1.1`, `v0.1.2`, and so on,
+whether the change fixes a bug or adds API. Tag the merged `main` commit the
+release describes, annotate it, and publish it with notes that say what changed:
+
+```sh
+git tag -a v0.1.1 -m "Mayu v0.1.1"
+git push origin v0.1.1
+gh release create v0.1.1 --title "Mayu v0.1.1" --notes-file <file>
+```
+
+A tag on an unmerged branch is not a release. `v0.1.0` went out on `ab94120`;
+`git tag -l` must never show anything that is not on `main`, and the version in
+the tag is the only version the repository carries.
+
 ## Preflight
 
 A pull request must pass all three, and `.github/workflows/ci.yml` runs exactly
