@@ -238,7 +238,7 @@ func (a *galleryApp) modals(c *ui.Context, t *theme.Theme) {
 		})
 
 		ui.Column(c).Gap(8).Children(func() {
-			ui.Text(c, "显示选项").FontSize(theme.TitleSmall.Size).Bold().TextColor(t.Scheme.OnSurface)
+			ui.Text(c, "显示选项").FontSize(theme.TitleSmall.Size).FontWeight(theme.TitleSmall.Weight).TextColor(t.Scheme.OnSurface)
 			mayu.Switch(c, &a.switchVal, "夜间模式")
 			mayu.Checkbox(c, &a.checkboxVal, "硬件加速合成")
 		})

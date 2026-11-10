@@ -17,19 +17,51 @@ func (a *galleryApp) matches(title string) bool {
 	return q == "" || strings.Contains(strings.ToLower(title), q)
 }
 
-// section renders one titled section of a page: its title, its content, and
-// the divider that closes it. A title the search box does not admit is left
-// out whole, divider and all. It reports whether the section was shown.
-func (a *galleryApp) section(c *ui.Context, title string, body func()) bool {
-	if !a.matches(title) {
-		return false
+// gallerySection is one titled section of a page: its heading and the body
+// that builds it.
+type gallerySection struct {
+	title string
+	body  func()
+}
+
+// sectionColumns draws a page's sections in two columns, keeping a section the
+// search box rejects out whole, divider and all. Sections alternate between the
+// columns, so the reading order stays left to right. When only one section
+// survives the search, it takes the width alone.
+func (a *galleryApp) sectionColumns(c *ui.Context, t *theme.Theme, sections []gallerySection) {
+	var columns [2][]gallerySection
+	shown := 0
+	for _, s := range sections {
+		if !a.matches(s.title) {
+			continue
+		}
+		columns[shown%2] = append(columns[shown%2], s)
+		shown++
 	}
-	ui.Column(c).Gap(12).Children(func() {
-		ui.Text(c, title).FontSize(theme.TitleMedium.Size).Bold()
-		body()
+	if shown == 0 {
+		a.emptyState(c, 0, t)
+		return
+	}
+
+	render := func(col []gallerySection) {
+		for _, s := range col {
+			ui.Column(c).Gap(10).Children(func() {
+				ui.Text(c, s.title).FontSize(theme.TitleMedium.Size).
+					FontWeight(theme.TitleMedium.Weight).TextColor(t.Scheme.OnSurface)
+				s.body()
+			})
+			mayu.HorizontalDivider(c)
+		}
+	}
+
+	if len(columns[1]) == 0 {
+		ui.Column(c).FillWidth().Gap(20).Children(func() { render(columns[0]) })
+		return
+	}
+	ui.Row(c).FillWidth().AlignItems(ui.Start).Gap(28).Children(func() {
+		ui.Column(c).Grow(1).Gap(20).Children(func() { render(columns[0]) })
+		ui.Column(c).Grow(1).Gap(20).Children(func() { render(columns[1]) })
 	})
-	mayu.HorizontalDivider(c)
-	return true
 }
 
 // emptyState says so when the search box admits no section of a page, rather
@@ -50,14 +82,15 @@ func (a *galleryApp) emptyState(c *ui.Context, shown int, t *theme.Theme) {
 func (a *galleryApp) header(c *ui.Context, t *theme.Theme) {
 	ui.Row(c).AlignItems(ui.Center).Gap(16).FillWidth().Children(func() {
 		ui.Column(c).Gap(2).Shrink(0).Children(func() {
-			ui.Text(c, "Mayu Gallery").FontSize(theme.HeadlineSmall.Size).Bold()
+			ui.Text(c, "Mayu Gallery").FontSize(theme.HeadlineSmall.Size).
+				FontWeight(theme.HeadlineSmall.Weight)
 			ui.Text(c, a.pageTitle()).FontSize(theme.BodyMedium.Size).
 				TextColor(t.Scheme.OnSurfaceVariant)
 		})
 
 		ui.Spacer(c)
 
-		mayu.SearchBar(c, &a.searchQuery, "Filter this page's components...").Width(280)
+		mayu.SearchBar(c, &a.searchQuery, "Filter components...").Width(280)
 
 		density := "Standard"
 		switch a.density {
@@ -92,12 +125,9 @@ func (a *galleryApp) header(c *ui.Context, t *theme.Theme) {
 // nothing visible is still legible.
 func (a *galleryApp) statusFooter(c *ui.Context, t *theme.Theme) {
 	ui.Row(c).Gap(8).AlignItems(ui.Center).Children(func() {
-		ui.Text(c, fmt.Sprintf("Clicks: %d", a.clicks)).Bold()
+		ui.Text(c, fmt.Sprintf("Clicks: %d", a.clicks)).FontWeight(theme.LabelLarge.Weight)
 		ui.Text(c, "•").TextColor(t.Scheme.Outline)
-		ui.Text(c, fmt.Sprintf("Page=%s, Segment=%d, Tier=%s", a.pageTitle(), a.segIdx, a.radioChoice)).
-			TextColor(t.Scheme.OnSurfaceVariant)
-		ui.Text(c, "•").TextColor(t.Scheme.Outline)
-		ui.Text(c, fmt.Sprintf("Status: %s", a.lastAction)).TextColor(t.Scheme.Primary)
+		ui.Text(c, a.lastAction).TextColor(t.Scheme.OnSurfaceVariant)
 	})
 }
 
@@ -108,9 +138,9 @@ func (a *galleryApp) toastHost(c *ui.Context, t *theme.Theme) {
 	if a.toastShape == 1 {
 		shape = mayu.ToastCorner
 	}
-	color := mayu.ToastSurface
+	color := mayu.ToastInverse
 	if a.toastColor == 1 {
-		color = mayu.ToastInverse
+		color = mayu.ToastSurface
 	}
 	mayu.ToastHostWith(c, mayu.ToastHostOptions{
 		Placement: mayu.ToastBottomEnd,
